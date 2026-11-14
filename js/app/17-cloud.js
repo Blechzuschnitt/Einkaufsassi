@@ -57,7 +57,7 @@ function cloudPull() {
 }
 /* Nach dem Anmelden: erst vorhandene Cloud-Daten zusammenführen, dann sichern */
 function cloudConnected() {
-  var c = cloudCfg(); c.on = true; c.email = cloud.user.email; S.save();
+  var c = cloudCfg(); c.on = true; c.email = cloudUserLabel(cloud.user); S.save();
   if (location.hash.indexOf("access_token") >= 0) history.replaceState(null, "", location.pathname + location.search);
   cloudPull().then(function (n) {
     render();
@@ -76,10 +76,27 @@ function cloudStart() {
   if (!CLOUD_KEY || (!c.on && !fromLink)) return;
   cloudClient().then(function () { if (cloud.user && c.on) cloudPush(); }).catch(function (e) { cloud.err = e.message; });
 }
-function cloudSignIn(email) {
+var CLOUD_DOMAIN = "@nutzer.einkaufsassi.invalid";   /* reservierte Endung: dorthin wird nie eine Mail zugestellt */
+function cloudName(u) { return String(u || "").trim().toLowerCase(); }
+function cloudUserLabel(user) { var e = user && user.email || ""; return e.slice(-CLOUD_DOMAIN.length) === CLOUD_DOMAIN ? e.slice(0, -CLOUD_DOMAIN.length) : e; }
+function cloudErr(m) {
+  m = String(m || "");
+  if (/invalid login credentials/i.test(m)) return "Benutzername oder Passwort falsch.";
+  if (/already registered|already exists/i.test(m)) return "Den Benutzernamen gibt es schon – bitte anmelden oder einen anderen wählen.";
+  if (/email not confirmed/i.test(m)) return "Konto noch nicht freigeschaltet: In Supabase muss „Confirm email“ ausgeschaltet sein.";
+  if (/password/i.test(m) && /6|short|weak/i.test(m)) return "Das Passwort ist zu kurz (mindestens 6 Zeichen).";
+  if (/rate limit/i.test(m)) return "Zu viele Versuche – bitte kurz warten.";
+  return m;
+}
+function cloudLogin(user, pass, register) {
   return cloudClient().then(function (sb) {
-    return sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: true } });
-  }).then(function (r) { if (r.error) throw new Error(r.error.message); });
+    var email = cloudName(user) + CLOUD_DOMAIN;
+    return register ? sb.auth.signUp({ email: email, password: pass }) : sb.auth.signInWithPassword({ email: email, password: pass });
+  }).then(function (r) {
+    if (r.error) throw new Error(cloudErr(r.error.message));
+    if (register && !r.data.session) throw new Error("Konto angelegt, aber noch nicht freigeschaltet: In Supabase muss „Confirm email“ ausgeschaltet sein.");
+    if (r.data.user && !cloud.user) { cloud.user = r.data.user; cloudConnected(); }
+  });
 }
 function cloudSignOut() {
   var c = cloudCfg(); c.on = false; S.save();
@@ -89,7 +106,7 @@ function cloudStatusText() {
   var c = cloudCfg();
   if (!CLOUD_KEY) return "noch nicht eingerichtet";
   if (!c.on || !cloud.user) return "aus";
-  return "an · " + esc(cloud.user.email || c.email || "") + (cloudLast() ? " · zuletzt " + new Date(cloudLast()).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "") + (cloud.err ? ' · <span class="bad">Fehler: ' + esc(cloud.err) + "</span>" : "");
+  return "an · " + esc(cloudUserLabel(cloud.user) || c.email || "") + (cloudLast() ? " · zuletzt " + new Date(cloudLast()).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "") + (cloud.err ? ' · <span class="bad">Fehler: ' + esc(cloud.err) + "</span>" : "");
 }
 /* Menü-Bildschirm */
 function openCloud() {
@@ -100,18 +117,23 @@ function openCloud() {
           '<button class="btn" id="cPull" type="button">' + I("download") + " Aus der Cloud holen (zusammenführen)</button></div>" +
           '<label class="check"><input type="checkbox" id="cCards"' + (c.cards ? " checked" : "") + "> Kundenkarten mitsichern</label>" +
           '<div class="col"><button class="btn danger" id="cOut" type="button">Abmelden (Daten bleiben auf dem Handy)</button></div>'
-        : '<div class="hint">Gib deine E-Mail-Adresse ein. Du bekommst einen Anmelde-Link – kein Passwort nötig. Danach sichert die App automatisch nach jeder Änderung. Auf einem neuen Handy meldest du dich genauso an und alles ist wieder da.</div>' +
-          '<label class="f">E-Mail</label><input type="text" id="cMail" inputmode="email" autocomplete="email" value="' + esc(c.email || "") + '" placeholder="name@beispiel.de">' +
-          '<div class="col"><button class="btn primary" id="cGo" type="button" style="flex:none">Anmelde-Link schicken</button></div>' +
-          '<div class="hint">Öffne den Link aus der Mail auf <b>diesem</b> Handy im selben Browser.</div>') +
+        : '<div class="hint">Mit Benutzername und Passwort sichert die App automatisch nach jeder Änderung in die Cloud. Auf einem neuen Handy meldest du dich genauso an und alles ist wieder da.</div>' +
+          '<label class="f">Benutzername</label><input type="text" id="cUser" autocomplete="username" autocapitalize="none" spellcheck="false" value="' + esc(c.email && c.email.indexOf("@") < 0 ? c.email : "") + '" placeholder="z. B. sascha">' +
+          '<label class="f">Passwort</label><input type="password" id="cPass" autocomplete="current-password" placeholder="mindestens 6 Zeichen">' +
+          '<div class="col"><button class="btn primary" id="cIn" type="button" style="flex:none">Anmelden</button>' +
+          '<button class="btn" id="cReg" type="button">Neues Konto anlegen</button></div>' +
+          '<div class="hint">Merk dir das Passwort gut – ohne E-Mail-Adresse lässt es sich nicht zurücksetzen.</div>') +
     '<div id="msg"></div>');
   ctx = { simple: true };
-  if ($("cGo")) $("cGo").onclick = function () {
-    var m = $("cMail").value.trim();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)) { msg("Bitte eine gültige E-Mail-Adresse eingeben.", "bad"); return; }
-    msg("Sende …", "ok"); c.email = m; S.save();
-    cloudSignIn(m).then(function () { msg("Link verschickt – schau in dein Postfach (auch im Spam-Ordner).", "ok"); }, function (e) { msg("Hat nicht geklappt: " + e.message, "bad"); });
-  };
+  function go(register) {
+    var u = cloudName($("cUser").value), p = $("cPass").value;
+    if (!/^[a-z0-9._-]{3,30}$/.test(u)) { msg("Benutzername: 3–30 Zeichen, nur Buchstaben a–z, Ziffern und . _ -", "bad"); $("cUser").focus(); return; }
+    if (p.length < 6) { msg("Das Passwort braucht mindestens 6 Zeichen.", "bad"); $("cPass").focus(); return; }
+    msg(register ? "Lege Konto an …" : "Melde an …", "ok");
+    cloudLogin(u, p, register).then(function () { openCloud(); }, function (e) { msg(e.message, "bad"); });
+  }
+  if ($("cIn")) { $("cIn").onclick = function () { go(false); }; $("cReg").onclick = function () { go(true); };
+    $("cPass").onkeydown = function (e) { if (e.key === "Enter") { e.preventDefault(); go(false); } }; }
   if ($("cNow")) $("cNow").onclick = function () { msg("Sichere …", "ok"); cloudPush().then(function () { if (cloud.err) msg("Fehler: " + cloud.err, "bad"); else openCloud(); }); };
   if ($("cPull")) $("cPull").onclick = function () { cloudPull().then(function (n) { render(); msg(n < 0 ? "In der Cloud liegt noch nichts." : "Zusammengeführt: " + n + " neue Artikel.", "ok"); }, function (e) { msg("Fehler: " + e.message, "bad"); }); };
   if ($("cCards")) $("cCards").onchange = function () { c.cards = this.checked; S.save(); cloudPush(); };
