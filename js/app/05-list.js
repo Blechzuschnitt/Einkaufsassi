@@ -7,7 +7,7 @@ function viewList() {
   h += '<option value="__new">＋ Neue Liste …</option></select><button class="icon" data-act="listmenu" aria-label="Listen-Optionen">⋯</button></div>';
   if (!l.items.length) return h + '<div class="empty">Die Liste ist leer.<br>Oben suchen und antippen, ＋ für einen neuen Artikel<br>oder unten <b>Scannen</b>.</div>';
   var open = l.items.filter(function (i) { return !i.done; }), done = l.items.filter(function (i) { return i.done; });
-  var route = state.route[state.store] || {}, known = open.filter(function (i) { return route[i.b] != null; }).length;
+  var route = F("route") ? state.route[state.store] || {} : {}, known = open.filter(function (i) { return route[i.b] != null; }).length;
   if (known) {
     open = open.map(function (it, i) { return { it: it, i: i }; }).sort(function (a, c) {
       var x = route[a.it.b], y = route[c.it.b];
@@ -33,7 +33,7 @@ function viewList() {
     (t.saved ? '<div class="kv s"><span>' + I("tag") + ' Angebote eingerechnet (' + t.offers + ")</span><span class=\"acc\">−" + money(t.saved) + "</span></div>" : "") +
     (t.miss ? '<div class="kv s warn"><span>' + t.miss + " ohne Preis</span><span>nicht eingerechnet</span></div>" : "") + "</div>";
   if (t.doneN) h += '<div class="col"><button class="btn finish" data-act="finish" type="button" style="flex:none">✓ Einkauf fertig – ' + t.doneN + " abgehakte Artikel in den Vorrat</button></div>";
-  h += '<div class="offbar"><button class="btn" data-act="offers" type="button"' + (opBusy ? " disabled" : "") + ">" + I("tag") + " Angebote prüfen</button>" +
+  if (F("offers")) h += '<div class="offbar"><button class="btn" data-act="offers" type="button"' + (opBusy ? " disabled" : "") + ">" + I("tag") + " Angebote prüfen</button>" +
     (opInfo ? '<div class="hint">' + esc(opInfo) + "</div>" : '<div class="hint">Sucht in Open Prices nach in Deutschland gemeldeten Angeboten (letzte 3 Wochen, nur Artikel mit Barcode). Eigene Angebote trägst du im Artikel ein.</div>') + "</div>";
   setTimeout(function () { checkOffers(false); }, 300);
   h += splitNote(l);

@@ -62,6 +62,7 @@ $("sumbar").addEventListener("click", function () { if (tab !== "list" && tab !=
 
 function monthKey(ts) { var d = new Date(ts); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2); }
 function cheapest(l) {
+  if (!F("cheapest")) return null;
   var all = S.storeCompare(l).filter(function (r) { return r.of > 0 && r.have === r.of; }).sort(function (a, b) { return a.sum - b.sum; });
   return all.length >= 2 ? all : null;
 }

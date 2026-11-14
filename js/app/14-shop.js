@@ -13,7 +13,7 @@ function exitShop() {
   go("list");
 }
 function sortedOpen(l) {
-  var route = state.route[state.store] || {};
+  var route = F("route") ? state.route[state.store] || {} : {};
   return l.items.filter(function (i) { return !i.done; }).map(function (it, i) { return { it: it, i: i }; }).sort(function (a, c) {
     var x = route[a.it.b], y = route[c.it.b];
     if (x == null && y == null) return a.i - c.i; if (x == null) return 1; if (y == null) return -1; return x - y || a.i - c.i;
@@ -75,6 +75,7 @@ function splitPlan(l) {
   return { groups: groups, total: total, single: single, unpriced: unpriced };
 }
 function splitNote(l) {
+  if (!F("cheapest")) return "";
   var sp = splitPlan(l), ks = Object.keys(sp.groups).sort(function (a, b) { return sp.groups[b].items.length - sp.groups[a].items.length; });
   if (ks.length < 2) return "";
   var save = sp.single ? sp.single.sum - sp.total : null, worth = save == null || save >= 100;

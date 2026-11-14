@@ -20,6 +20,7 @@ function reorderList() {
   return out.sort(function (a, b) { return b.r - a.r; });
 }
 function reorderNote() {
+  if (!F("reorder")) return "";
   var r = reorderList(); if (!r.length) return "";
   return '<div class="note re">' + I("repeat") + ' <b>Nachkaufen?</b>' + r.slice(0, 5).map(function (x) {
     return '<div class="kv s"><span>' + esc(S.products[x.b].name) + " <small>alle ~" + x.avg + " Tage, zuletzt vor " + x.since + '</small></span><button class="chip" type="button" data-act="addb" data-b="' + esc(x.b) + '">＋ Liste</button></div>';
@@ -41,6 +42,7 @@ function soonKeys(days) {
     .sort(function (a, b) { return S.pantryOf(a).exp < S.pantryOf(b).exp ? -1 : 1; });
 }
 function recipeButton() {
+  if (!F("recipes")) return "";
   var ks = soonKeys(3); if (!ks.length) return "";
   return '<button class="btn sm recipe" type="button" data-act="recipe">' + I("pan") + ' Rezeptideen mit ' + ks.slice(0, 3).map(function (b) { return esc(ingredient(S.products[b].name) || S.products[b].name); }).join(", ") + "</button>";
 }
@@ -95,6 +97,7 @@ function alarmHits() {
   return out;
 }
 function alarmNote() {
+  if (!F("alarm")) return "";
   if (Object.keys(S.products).some(function (b) { return S.products[b].alarm; })) setTimeout(function () { checkOffers(false); }, 400);
   var a = alarmHits(); if (!a.length) return "";
   return '<div class="note alarm">' + I("bell") + ' <b>Preisalarm</b>' + a.map(function (x) {

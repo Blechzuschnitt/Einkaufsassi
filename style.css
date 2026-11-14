@@ -540,3 +540,15 @@ body.shopmode header{display:none}
 #launch .lt small{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #launch .lremember{justify-content:center;color:var(--muted);font-size:14px;margin-top:16px}
 .lc span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---- Schalter (Funktionen) ---- */
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.tog:first-child{border-top:0}
+.tog span{display:flex;flex-direction:column;min-width:0}
+.tog small{font-size:12px;color:var(--muted)}
+.tog input{position:absolute;opacity:0;width:1px;height:1px}
+.tog i{flex:none;width:48px;height:28px;border-radius:14px;background:var(--card2);border:2px solid var(--line);position:relative;transition:background .15s}
+.tog i::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:left .15s}
+.tog input:checked + i{background:var(--accent);border-color:var(--accent)}
+.tog input:checked + i::after{left:22px;background:#000}
+.tog input:focus-visible + i{outline:2px solid var(--ink);outline-offset:2px}

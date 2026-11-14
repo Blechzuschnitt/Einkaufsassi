@@ -27,7 +27,7 @@ function viewHome() {
     h += '<button class="lrow' + (x.id === l.id ? " on" : "") + '" data-list="' + esc(x.id) + '"><span><b>' + esc(x.name) + "</b><small>" + U.badge(x.store || state.store, "xs") + " " + tt.n + " Artikel" + (tt.doneN ? " · " + tt.doneN + " im Wagen" : "") + "</small></span><b>" + money(tt.total) + "</b></button>";
   });
   h += '<button class="lrow add" data-act="newlist">＋ Neue Liste</button>';
-  if (!state.budget) h += '<button class="lrow add bud" data-act="budget">' + I("wallet") + ' Monatsbudget festlegen</button>';
+  if (!state.budget && F("budget")) h += '<button class="lrow add bud" data-act="budget">' + I("wallet") + ' Monatsbudget festlegen</button>';
   if (P.length) {
     var p = P[P.length - 1], d = p.total - p.expected;
     h += '<h3>Letzter Einkauf</h3><div class="card"><div class="kv"><span>' + U.day(p.date) + " " + U.badge(p.store, "sm") + "</span><b>" + money(p.total) + "</b></div>" +
@@ -38,6 +38,7 @@ function viewHome() {
 }
 /* ---------- Sicherungs-Erinnerung ---------- */
 function backupNote() {
+  if (!F("backup")) return "";
   var last = state.lastBackup || 0, ref = last || state.firstUse, now = Date.now();
   if (!Object.keys(S.products).length || now - ref < 7 * 864e5 || (state.backupSnooze || 0) > now) return "";
   return '<div class="note bk">' + I("download") + ' <b>' + (last ? "Letzte Sicherung " + ago(last) : "Noch keine Sicherung gemacht") + ".</b> Deine Daten (Preise, Vorrat, Kundenkarte) liegen nur auf diesem Handy." +
@@ -59,6 +60,7 @@ function mhdText(exp) {
 }
 function mhdClass(exp) { var n = daysTo(exp); return n < 0 ? "bad" : n <= 3 ? "warn" : "ok"; }
 function expiryNote() {
+  if (!F("expiry")) return "";
   var soon = Object.keys(state.pantry).filter(function (b) { var v = S.pantryOf(b); return S.products[b] && v.q && v.exp && daysTo(v.exp) <= 3; })
     .sort(function (a, b) { return S.pantryOf(a).exp < S.pantryOf(b).exp ? -1 : 1; });
   if (!soon.length) return "";
@@ -80,6 +82,7 @@ function askMhd(b) {
 /* ---------- Monatsbudget ---------- */
 function monthSpent() { var k = monthKey(Date.now()); return state.purchases.filter(function (p) { return monthKey(p.date) === k; }).reduce(function (a, p) { return a + p.total; }, 0); }
 function budgetCard(listTotal) {
+  if (!F("budget")) return "";
   if (!state.budget) return "";
   var spent = monthSpent(), left = state.budget - spent, pct = spent / state.budget, after = left - (listTotal || 0);
   var cls = pct >= 1 ? "bad" : pct >= 0.8 ? "warn" : "ok";

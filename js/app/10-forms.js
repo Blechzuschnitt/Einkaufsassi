@@ -45,7 +45,7 @@ function openEdit(b, opts) {
       : '<label class="check"><input type="checkbox" id="fL"' + (addDefault ? " checked" : "") + "> Auf die Liste „" + esc(l.name) + "“" + (have ? " (steht schon " + have + "× drauf → +1)" : "") + "</label>") +
     (p && S.pantryOf(b).q && opts.target !== "pantry" ? '<div class="hint pan">Im Vorrat: ' + S.pantryOf(b).q + "× seit " + U.day(S.pantryOf(b).since) + "</div>" : "") +
     (p && !p.loose ? priceChart(p) : "") + (p ? nutriBlock(p) : "") +
-    (p && !p.loose ? '<label class="f">Preisalarm – melden, wenn es irgendwo höchstens … € kostet</label><input type="text" id="fAlarm" inputmode="decimal" value="' + (p.alarm ? U.cents2str(p.alarm) : "") + '" placeholder="kein Alarm" autocomplete="off">' : "") +
+    (p && !p.loose && F("alarm") ? '<label class="f">Preisalarm – melden, wenn es irgendwo höchstens … € kostet</label><input type="text" id="fAlarm" inputmode="decimal" value="' + (p.alarm ? U.cents2str(p.alarm) : "") + '" placeholder="kein Alarm" autocomplete="off">' : "") +
     (p ? '<h3>' + I("tag") + ' Angebote</h3><div id="offs"></div>' +
       '<div class="offadd"><select id="oS" aria-label="Markt">' + state.stores.map(function (x) { return '<option' + (x === state.store ? " selected" : "") + ">" + esc(x) + "</option>"; }).join("") + "</select>" +
       '<input type="text" id="oP" inputmode="decimal" placeholder="Preis" autocomplete="off"><input type="date" id="oU" value="' + plusDays(6) + '" aria-label="gültig bis"></div>' +
@@ -176,6 +176,8 @@ function openSimple(title, label, ph, mode, okText, okFn) {
 function openMenu() {
   var ms = state.stores.map(function (s, i) { return '<div class="kv mrow"><span>' + U.badge(s) + '</span><span class="mbtns"><button class="chip' + (state.cards[s] ? " on" : "") + '" data-card="' + i + '" type="button">' + (state.cards[s] ? "" + I("qr") + " Karte" : "＋ Karte") + '</button><button class="chip" data-del="' + i + '" type="button">entfernen</button></span></div>'; }).join("");
   openShell("Menü",
+    '<h3>Funktionen</h3><div class="card" id="mFeat">' + FEATURES.map(function (f) {
+      return '<label class="tog"><span><b>' + f[1] + "</b><small>" + f[2] + '</small></span><input type="checkbox" data-f="' + f[0] + '"' + (F(f[0]) ? " checked" : "") + '><i></i></label>'; }).join("") + "</div>" +
     "<h3>Märkte</h3><div class=\"card\">" + ms + '</div><div class="col" style="margin-top:8px"><button class="btn" id="mAdd" type="button">＋ Markt hinzufügen</button></div>' +
     '<h3>Lagerorte</h3><div class="card" id="mLocs">' + S.LOCS.map(function (l, i) {
       return '<div class="kv mrow"><span>' + locIco(l) + " " + esc(l.t) + "</span>" + (i < 3 ? "<small>fest</small>" : '<button class="chip" type="button" data-ldel="' + esc(l.k) + '">entfernen</button>') + "</div>"; }).join("") + "</div>" +
@@ -214,6 +216,7 @@ function openMenu() {
   });
   $("mSave").onclick = function () { doBackup(); msg("Sicherung wurde heruntergeladen.", "ok"); };
   $("mBud").onclick = function () { closeEdit(); askBudget(); };
+  $("mFeat").onchange = function (e) { var x = e.target; if (!x.dataset.f) return; if (!state.features) state.features = {}; state.features[x.dataset.f] = x.checked; S.save(); render(); };
   $("mLaunch").onclick = function (e) { var x = e.target.closest("[data-l]"); if (!x) return; state.launch = x.dataset.l; S.save();
     Array.prototype.forEach.call(this.querySelectorAll("[data-l]"), function (y) { y.classList.toggle("on", y === x); }); };
   $("mCloud").onclick = function () { closeEdit(); openCloud(); };
