@@ -148,9 +148,9 @@ body.scanning #scanPanel{display:block}
 .eh .btn{min-height:46px}
 .eh b{font-size:20px}
 label.f{display:block;font-size:14px;color:var(--muted);margin:14px 0 6px}
-input[type=text],input[type=password],textarea{width:100%;padding:15px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-size:20px}
+input[type=text],input[type=password],input[type=email],textarea{width:100%;padding:15px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-size:20px}
 textarea{font-size:15px;min-height:110px;font-family:ui-monospace,Consolas,monospace}
-input[type=text]:focus,input[type=password]:focus,textarea:focus{outline:none;border-color:var(--accent)}
+input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,textarea:focus{outline:none;border-color:var(--accent)}
 input[readonly]{color:var(--muted)}
 .hint{font-size:14px;color:var(--muted);margin-top:8px}
 #msg{margin-top:14px;padding:12px;border-radius:12px;font-weight:600;display:none}

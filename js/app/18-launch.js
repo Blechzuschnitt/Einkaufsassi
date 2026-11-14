@@ -44,20 +44,20 @@ function showAccountStep(next) {
   var d = document.createElement("div"); d.id = "launch"; d.className = "onb"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Konto anlegen");
   d.innerHTML = '<div class="lwrap"><img class="llogo sm" src="logo.webp" alt="EinkaufsAssi" width="150" height="150">' +
     '<div class="ltitle">Konto anlegen</div><div class="lq">Schritt 2 von 2<br><small>Mit Konto werden deine Daten automatisch in der Cloud gesichert und sind auf jedem Handy wieder da.</small></div>' +
-    '<div class="card"><label class="f" style="margin-top:0">Benutzername</label><input type="text" id="aUser" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="z. B. sascha">' +
+    '<div class="card"><label class="f" style="margin-top:0">E-Mail-Adresse</label><input type="email" id="aUser" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="name@beispiel.de">' +
     '<label class="f">Passwort</label><input type="password" id="aPass" autocomplete="new-password" placeholder="mindestens 6 Zeichen">' +
     '<div id="aMsg" class="amsg"></div>' +
     '<div class="col"><button class="btn primary" id="aReg" type="button" style="flex:none">Konto anlegen</button>' +
     '<button class="btn" id="aIn" type="button">Ich habe schon ein Konto – anmelden</button></div>' +
-    '<div class="hint">Merk dir das Passwort gut – ohne E-Mail-Adresse lässt es sich nicht zurücksetzen.</div></div>' +
+    '<div class="hint">Es wird keine Bestätigungs-Mail verschickt – du bist sofort angemeldet.</div></div>' +
     '<div class="warnbox">' + I("alert") + ' <b>Ohne Konto</b> werden deine Daten nur in diesem Browser gespeichert. Löschst du die Browserdaten oder wechselst das Handy, sind Listen, Preise und Vorrat weg.</div>' +
     '<div class="col"><button class="btn" id="aSkip" type="button">Ohne Konto weiter</button></div>' +
     '<div class="hint" style="text-align:center">Ein Konto kannst du auch später im Menü unter „Cloud-Sicherung“ anlegen.</div></div>';
   document.body.appendChild(d);
   var say = function (t, bad) { var m = $("aMsg"); m.textContent = t; m.className = "amsg " + (bad ? "bad" : "ok"); };
   function go(register) {
-    var u = cloudName($("aUser").value), p = $("aPass").value;
-    if (!/^[a-z0-9._-]{3,30}$/.test(u)) { say("Benutzername: 3–30 Zeichen, nur Buchstaben a–z, Ziffern und . _ -", true); $("aUser").focus(); return; }
+    var u = $("aUser").value.trim().toLowerCase(), p = $("aPass").value;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(u)) { say("Bitte eine gültige E-Mail-Adresse eingeben.", true); $("aUser").focus(); return; }
     if (p.length < 6) { say("Das Passwort braucht mindestens 6 Zeichen.", true); $("aPass").focus(); return; }
     say(register ? "Lege Konto an …" : "Melde an …");
     cloudLogin(u, p, register).then(function () {

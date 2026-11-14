@@ -81,8 +81,9 @@ function cloudName(u) { return String(u || "").trim().toLowerCase(); }
 function cloudUserLabel(user) { var e = user && user.email || ""; return e.slice(-CLOUD_DOMAIN.length) === CLOUD_DOMAIN ? e.slice(0, -CLOUD_DOMAIN.length) : e; }
 function cloudErr(m) {
   m = String(m || "");
-  if (/invalid login credentials/i.test(m)) return "Benutzername oder Passwort falsch.";
-  if (/already registered|already exists/i.test(m)) return "Den Benutzernamen gibt es schon – bitte anmelden oder einen anderen wählen.";
+  if (/invalid login credentials/i.test(m)) return "E-Mail-Adresse oder Passwort falsch.";
+  if (/already registered|already exists/i.test(m)) return "Für diese E-Mail-Adresse gibt es schon ein Konto – bitte anmelden.";
+  if (/invalid/i.test(m) && /email/i.test(m)) return "Diese E-Mail-Adresse ist ungültig.";
   if (/email not confirmed/i.test(m)) return "Konto noch nicht freigeschaltet: In Supabase muss „Confirm email“ ausgeschaltet sein.";
   if (/password/i.test(m) && /6|short|weak/i.test(m)) return "Das Passwort ist zu kurz (mindestens 6 Zeichen).";
   if (/rate limit/i.test(m)) return "Zu viele Versuche – bitte kurz warten.";
@@ -90,7 +91,7 @@ function cloudErr(m) {
 }
 function cloudLogin(user, pass, register) {
   return cloudClient().then(function (sb) {
-    var email = cloudName(user) + CLOUD_DOMAIN;
+    var email = String(user).indexOf("@") >= 0 ? String(user).trim().toLowerCase() : cloudName(user) + CLOUD_DOMAIN;   /* alte Benutzernamen-Konten bleiben nutzbar */
     return register ? sb.auth.signUp({ email: email, password: pass }) : sb.auth.signInWithPassword({ email: email, password: pass });
   }).then(function (r) {
     if (r.error) throw new Error(cloudErr(r.error.message));
@@ -117,17 +118,17 @@ function openCloud() {
           '<button class="btn" id="cPull" type="button">' + I("download") + " Aus der Cloud holen (zusammenführen)</button></div>" +
           '<label class="check"><input type="checkbox" id="cCards"' + (c.cards ? " checked" : "") + "> Kundenkarten mitsichern</label>" +
           '<div class="col"><button class="btn danger" id="cOut" type="button">Abmelden (Daten bleiben auf dem Handy)</button></div>'
-        : '<div class="hint">Mit Benutzername und Passwort sichert die App automatisch nach jeder Änderung in die Cloud. Auf einem neuen Handy meldest du dich genauso an und alles ist wieder da.</div>' +
-          '<label class="f">Benutzername</label><input type="text" id="cUser" autocomplete="username" autocapitalize="none" spellcheck="false" value="' + esc(c.email && c.email.indexOf("@") < 0 ? c.email : "") + '" placeholder="z. B. sascha">' +
+        : '<div class="hint">Mit E-Mail-Adresse und Passwort sichert die App automatisch nach jeder Änderung in die Cloud. Auf einem neuen Handy meldest du dich genauso an und alles ist wieder da.</div>' +
+          '<label class="f">E-Mail-Adresse</label><input type="email" id="cUser" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" value="' + esc(c.email || "") + '" placeholder="name@beispiel.de">' +
           '<label class="f">Passwort</label><input type="password" id="cPass" autocomplete="current-password" placeholder="mindestens 6 Zeichen">' +
           '<div class="col"><button class="btn primary" id="cIn" type="button" style="flex:none">Anmelden</button>' +
           '<button class="btn" id="cReg" type="button">Neues Konto anlegen</button></div>' +
-          '<div class="hint">Merk dir das Passwort gut – ohne E-Mail-Adresse lässt es sich nicht zurücksetzen.</div>') +
+          '<div class="hint">Es wird keine Bestätigungs-Mail verschickt – du bist sofort angemeldet.</div>') +
     '<div id="msg"></div>');
   ctx = { simple: true };
   function go(register) {
-    var u = cloudName($("cUser").value), p = $("cPass").value;
-    if (!/^[a-z0-9._-]{3,30}$/.test(u)) { msg("Benutzername: 3–30 Zeichen, nur Buchstaben a–z, Ziffern und . _ -", "bad"); $("cUser").focus(); return; }
+    var u = $("cUser").value.trim().toLowerCase(), p = $("cPass").value;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(u)) { msg("Bitte eine gültige E-Mail-Adresse eingeben.", "bad"); $("cUser").focus(); return; }
     if (p.length < 6) { msg("Das Passwort braucht mindestens 6 Zeichen.", "bad"); $("cPass").focus(); return; }
     msg(register ? "Lege Konto an …" : "Melde an …", "ok");
     cloudLogin(u, p, register).then(function () { openCloud(); }, function (e) { msg(e.message, "bad"); });
