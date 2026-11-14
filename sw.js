@@ -1,7 +1,7 @@
 /* Offline-Fähigkeit: App-Dateien werden beim ersten Besuch gespeichert (im Laden oft kein Netz). */
-var VERSION = "einkauf-v40";
+var VERSION = "einkauf-v41";
 var ASSETS = ["./", "index.html", "style.css", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png", "icon-maskable.png", "logo.webp", "logo-96.webp",
-  "js/data.js", "js/ui.js", "js/store.js", "js/lookup.js", "js/scanner.js", "js/compare.js", "js/app/00-icons.js", "js/app/01-core.js", "js/app/02-header.js", "js/app/03-nav.js", "js/app/04-home.js", "js/app/05-list.js", "js/app/06-pantry.js", "js/app/07-items.js", "js/app/08-stats.js", "js/app/09-clicks.js", "js/app/10-forms.js", "js/app/11-cards.js", "js/app/12-scan.js", "js/app/14-shop.js", "js/app/15-extras.js", "js/app/16-notify.js", "js/app/17-cloud.js", "js/app/18-launch.js", "js/app/13-main.js", "js/zxing.min.js"];
+  "js/data.js", "js/ui.js", "js/store.js", "js/lookup.js", "js/scanner.js", "js/compare.js", "js/app/00-icons.js", "js/app/01-core.js", "js/app/02-header.js", "js/app/03-nav.js", "js/app/04-home.js", "js/app/05-list.js", "js/app/06-pantry.js", "js/app/07-items.js", "js/app/08-stats.js", "js/app/09-clicks.js", "js/app/10-forms.js", "js/app/11-cards.js", "js/app/12-scan.js", "js/app/14-shop.js", "js/app/15-extras.js", "js/app/16-notify.js", "js/app/17-cloud.js", "js/app/18-launch.js", "js/app/19-back.js", "js/app/13-main.js", "js/zxing.min.js"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(ASSETS); }).then(function () { return self.skipWaiting(); }));

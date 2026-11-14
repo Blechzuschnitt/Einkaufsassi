@@ -12,6 +12,7 @@ S.load().then(function () {
   if (/^(home|list|pantry|stats|items)$/.test(pt)) tab = pt;
   applyTheme();
   render();
+  backInit();
   /* Startauswahl – nicht, wenn die App gezielt geöffnet wurde (Benachrichtigung, Anmelde-Link) */
   if (!pt && location.hash.indexOf("access_token") < 0) launchStart();
   cloudStart();
