@@ -1,7 +1,10 @@
-/* Daten + Speicherung (IndexedDB, Rückfall localStorage). Alles bleibt auf dem Gerät. */
+/* Daten + Speicherung (IndexedDB, Rückfall localStorage). Alles bleibt auf dem Gerät.
+   products: { key: {b, name, prices:{Markt:Cent}, deposit, img, imgUrl, hist:[{s,p,d}]} }
+   state.lists: [{id, name, store, created, items:[{b, qty, done}]}]
+   state.purchases: [{id, date, store, list, total, expected, items:[{name,b,price,qty}], extra, missing}] */
 var Store = (function () {
   var KEY = "data", LS = "einkauf-v2";
-  var state = { stores: DEFAULT_STORES.slice(), store: "Rewe", listed: {}, cart: {}, seeded: [] };
+  var state = { v: 3, stores: DEFAULT_STORES.slice(), store: "Lidl", lists: [], active: "", purchases: [], seeded: [] };
   var products = {};
   var listeners = [], saveTimer = null, saving = false, dirty = false, mode = "idb";
 
@@ -35,18 +38,39 @@ var Store = (function () {
     });
   }
 
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
   function apply(d) {
     if (!d) return;
     if (d.state) for (var k in d.state) state[k] = d.state[k];
     if (d.products) products = d.products;
+  }
+
+  /* Alte Version (ein „Wagen“ pro Markt) → Einkaufslisten */
+  function migrate() {
     if (!state.seeded) state.seeded = [];
+    if (!state.purchases) state.purchases = [];
+    if (!state.lists) state.lists = [];
+    if (!state.cards) state.cards = {};   // Kundenkarten: {Markt: {code, d}} – nur auf diesem Gerät
+    if (state.v !== 3) {
+      var cart = state.cart || {};
+      Object.keys(cart).forEach(function (st) {
+        var items = Object.keys(cart[st]).filter(function (b) { return products[b] && cart[st][b] > 0; })
+          .map(function (b) { return { b: b, qty: cart[st][b], done: false }; });
+        if (items.length) state.lists.push({ id: uid(), name: "Einkauf " + st, store: st, created: Date.now(), items: items });
+      });
+      delete state.cart; delete state.listed; state.v = 3;
+    }
+    if (!state.lists.length) state.lists.push({ id: uid(), name: "Einkaufsliste", store: state.store, created: Date.now(), items: [] });
+    if (!listById(state.active)) state.active = state.lists[0].id;
+    if (state.stores.indexOf(state.store) < 0) state.store = state.stores[0];
   }
 
   function load() {
     return idbGet(KEY).then(function (d) { apply(d); }).catch(function () {
       mode = "ls";
       try { apply(JSON.parse(localStorage.getItem(LS) || "null")); } catch (e) {}
-    });
+    }).then(migrate);
   }
 
   function emit(s) { listeners.forEach(function (f) { f(s); }); }
@@ -66,22 +90,56 @@ var Store = (function () {
       try { localStorage.setItem(LS, JSON.stringify(blob)); res(); } catch (e) { rej(e); }
     });
     p.then(function () { saving = false; emit("ok"); })
-     .catch(function (e) {
+     .catch(function () {
        saving = false;
        if (mode === "idb") { mode = "ls"; dirty = true; flush(); return; }
        emit("error");
      });
   }
 
-  /* ----- Helfer ----- */
-  function listedFor(st) { st = st || state.store; return state.listed[st] || (state.listed[st] = []); }
-  function cartFor(st) { st = st || state.store; return state.cart[st] || (state.cart[st] = {}); }
+  /* ----- Artikel ----- */
   function priceOf(b, st) { var p = products[b]; return p && p.prices ? p.prices[st || state.store] : undefined; }
-  function ensureListed(b, st) { var l = listedFor(st); if (l.indexOf(b) < 0) l.push(b); }
+  function setPrice(b, st, c) {
+    var p = products[b]; if (!p) return;
+    if (!p.prices) p.prices = {};
+    if (p.prices[st] === c) return;
+    p.prices[st] = c;
+    (p.hist || (p.hist = [])).push({ s: st, p: c, d: Date.now() });
+    if (p.hist.length > 30) p.hist.shift();
+  }
+  /* ----- Angebote: p.offers = [{s:Markt, p:Cent, until:"JJJJ-MM-TT"}] ; p.op = {t, hits} (Open Prices) ----- */
+  function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function offersOf(b) {
+    var p = products[b]; if (!p || !p.offers) return [];
+    var t = today(), act = p.offers.filter(function (o) { return o.until >= t; });
+    if (act.length !== p.offers.length) p.offers = act;
+    return act;
+  }
+  function offerAt(b, st) { st = st || state.store; return offersOf(b).filter(function (o) { return o.s === st; }).sort(function (a, c) { return a.p - c.p; })[0]; }
+  /* Preis, der wirklich gilt: Angebot, wenn es günstiger ist, sonst Normalpreis */
+  function effPrice(b, st) {
+    var r = priceOf(b, st), o = offerAt(b, st);
+    if (o && (r == null || o.p < r)) return o.p;
+    return r;
+  }
+  function addOffer(b, st, c, until) {
+    var p = products[b]; if (!p) return;
+    p.offers = offersOf(b).filter(function (o) { return o.s !== st; });
+    p.offers.push({ s: st, p: c, until: until });
+  }
+  function removeOffer(b, i) { var o = offersOf(b); o.splice(i, 1); products[b].offers = o; }
+  /* „REWE Markt GmbH“ → „Rewe“, wenn es den Markt in der App gibt */
+  function matchStore(brand) {
+    var n = String(brand || "").toLowerCase();
+    return state.stores.filter(function (s) { var k = s.toLowerCase(); return n.indexOf(k) >= 0 || k.indexOf(n) >= 0; })[0] || "";
+  }
+
   function slug(n) {
     return String(n).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
       .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "x";
   }
+  function newKey(name) { var base = "r-" + slug(name), k = base, i = 2; while (products[k]) k = base + "-" + i++; return k; }
+  function eachListItem(fn) { state.lists.forEach(function (l) { l.items.forEach(function (it) { fn(it, l); }); }); }
 
   /* Artikel ohne Barcode ("r-…") bekommt später einen echten Barcode */
   function rekey(old, nb, p) {
@@ -94,16 +152,63 @@ var Store = (function () {
       p = q;
     } else { p.b = nb; products[nb] = p; }
     delete products[old];
-    Object.keys(state.listed).forEach(function (st) {
+    state.lists.forEach(function (l) {
       var out = [];
-      state.listed[st].forEach(function (x) { x = x === old ? nb : x; if (out.indexOf(x) < 0) out.push(x); });
-      state.listed[st] = out;
-    });
-    Object.keys(state.cart).forEach(function (st) {
-      var c = state.cart[st];
-      if (c[old] != null) { c[nb] = (c[nb] || 0) + c[old]; delete c[old]; }
+      l.items.forEach(function (it) {
+        if (it.b === old) it.b = nb;
+        var dup = out.filter(function (o) { return o.b === it.b; })[0];
+        if (dup) dup.qty += it.qty; else out.push(it);
+      });
+      l.items = out;
     });
     return p;
+  }
+  function removeProduct(b) {
+    delete products[b];
+    state.lists.forEach(function (l) { l.items = l.items.filter(function (it) { return it.b !== b; }); });
+  }
+
+  /* ----- Listen ----- */
+  function listById(id) { return state.lists.filter(function (l) { return l.id === id; })[0]; }
+  function activeList() { return listById(state.active) || state.lists[0]; }
+  function newList(name) {
+    var l = { id: uid(), name: name || "Einkaufsliste", store: state.store, created: Date.now(), items: [] };
+    state.lists.push(l); state.active = l.id; return l;
+  }
+  function removeList(id) {
+    state.lists = state.lists.filter(function (l) { return l.id !== id; });
+    if (!state.lists.length) newList("Einkaufsliste");
+    if (!listById(state.active)) state.active = state.lists[0].id;
+  }
+  function addToList(b, n, l) {
+    l = l || activeList();
+    var it = l.items.filter(function (x) { return x.b === b; })[0];
+    if (it) { it.qty += n || 1; it.done = false; } else { it = { b: b, qty: n || 1, done: false }; l.items.push(it); }
+    return it;
+  }
+  /* Summen einer Liste für einen Markt */
+  function totals(l, st) {
+    l = l || activeList(); st = st || l.store || state.store;
+    var t = { n: 0, sum: 0, dep: 0, miss: 0, doneN: 0, doneSum: 0, rows: l.items.length, offers: 0, saved: 0 };
+    l.items.forEach(function (it) {
+      var p = products[it.b]; if (!p) return;
+      var pr = effPrice(it.b, st), dep = (p.deposit || 0) * it.qty, reg = priceOf(it.b, st);
+      if (pr != null && reg != null && pr < reg) { t.offers++; t.saved += (reg - pr) * it.qty; }
+      t.n += it.qty; t.dep += dep;
+      if (pr == null) t.miss++; else t.sum += pr * it.qty;
+      if (it.done) { t.doneN += it.qty; t.doneSum += (pr || 0) * it.qty + dep; }
+    });
+    t.total = t.sum + t.dep;
+    return t;
+  }
+  /* Was würde die Liste in jedem Markt kosten? */
+  function storeCompare(l) {
+    l = l || activeList();
+    return state.stores.map(function (st) {
+      var r = { store: st, sum: 0, have: 0, of: l.items.length };
+      l.items.forEach(function (it) { var pr = effPrice(it.b, st); if (pr != null) { r.have++; r.sum += pr * it.qty + ((products[it.b] || {}).deposit || 0) * it.qty; } });
+      return r;
+    }).filter(function (r) { return r.have > 0; });
   }
 
   /* Einmalige Startdaten */
@@ -118,7 +223,6 @@ var Store = (function () {
         if (!p.prices) p.prices = {};
         if (p.prices[sd.store] == null) p.prices[sd.store] = it[1];
         if (it[2] && p.deposit == null) p.deposit = it[2];
-        ensureListed(key, sd.store);
       });
       state.seeded.push(sd.id); changed = true;
     });
@@ -127,7 +231,7 @@ var Store = (function () {
   }
 
   /* ----- Sicherung ----- */
-  function exportJSON() { return JSON.stringify({ app: "einkauf", version: 2, state: state, products: products }, null, 1); }
+  function exportJSON() { return JSON.stringify({ app: "einkauf", version: 3, state: state, products: products }, null, 1); }
   function importJSON(text) {
     var d = JSON.parse(text);
     if (!d || typeof d !== "object" || !d.products) throw new Error("Keine gültige Sicherung");
@@ -142,18 +246,21 @@ var Store = (function () {
     });
     var s = d.state || {};
     (s.stores || []).forEach(function (st) { if (state.stores.indexOf(st) < 0) state.stores.push(st); });
-    Object.keys(s.listed || {}).forEach(function (st) {
-      (s.listed[st] || []).forEach(function (b) { if (products[b]) ensureListed(b, st); });
-    });
+    (s.lists || []).forEach(function (l) { if (!listById(l.id)) state.lists.push(l); });
+    (s.purchases || []).forEach(function (pu) { if (!state.purchases.some(function (x) { return x.id === pu.id; })) state.purchases.push(pu); });
     (s.seeded || []).forEach(function (id) { if (state.seeded.indexOf(id) < 0) state.seeded.push(id); });
+    state.purchases.sort(function (a, b) { return a.date - b.date; });
     save();
     return n;
   }
 
   return {
     get state() { return state; }, get products() { return products; },
-    load: load, save: save, onStatus: onStatus,
-    listedFor: listedFor, cartFor: cartFor, priceOf: priceOf, ensureListed: ensureListed,
-    slug: slug, rekey: rekey, applySeeds: applySeeds, exportJSON: exportJSON, importJSON: importJSON
+    load: load, save: save, onStatus: onStatus, uid: uid,
+    priceOf: priceOf, effPrice: effPrice, setPrice: setPrice, today: today,
+    offersOf: offersOf, offerAt: offerAt, addOffer: addOffer, removeOffer: removeOffer, matchStore: matchStore, newKey: newKey, rekey: rekey, removeProduct: removeProduct, eachListItem: eachListItem,
+    listById: listById, activeList: activeList, newList: newList, removeList: removeList, addToList: addToList,
+    totals: totals, storeCompare: storeCompare,
+    applySeeds: applySeeds, exportJSON: exportJSON, importJSON: importJSON
   };
 })();

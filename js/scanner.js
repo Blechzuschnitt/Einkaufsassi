@@ -15,15 +15,16 @@ var Scanner = (function () {
     });
     return zxP;
   }
-  function makeReader() {
-    var Z = window.ZXing, h = new Map();
+  function makeReader(qr) {
+    var Z = window.ZXing, h = new Map(), f = [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E, Z.BarcodeFormat.CODE_128];
+    if (qr) f = [Z.BarcodeFormat.QR_CODE, Z.BarcodeFormat.CODE_128, Z.BarcodeFormat.EAN_13];
     h.set(Z.DecodeHintType.TRY_HARDER, true);
-    h.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E, Z.BarcodeFormat.CODE_128]);
+    h.set(Z.DecodeHintType.POSSIBLE_FORMATS, f);
     return new Z.BrowserMultiFormatReader(h);
   }
-  function makeDetector() {
+  function makeDetector(qr) {
     if (!("BarcodeDetector" in window)) return null;
-    try { return new BarcodeDetector({ formats: FORMATS }); } catch (e) { return null; }
+    try { return new BarcodeDetector({ formats: qr ? ["qr_code", "code_128", "ean_13"] : FORMATS }); } catch (e) { return null; }
   }
 
   /* ----- Piepton ----- */
@@ -138,12 +139,13 @@ var Scanner = (function () {
     var r = document.createElement("canvas"); r.width = c.height; r.height = c.width;
     var x = r.getContext("2d"); x.translate(r.width, 0); x.rotate(Math.PI / 2); x.drawImage(c, 0, 0); return r;
   }
-  async function decodePhoto(file) {
-    var L = await loadImg(file), code = null, vs = variants(L.img), d = makeDetector();
+  /* qr = true: Kundenkarte (QR-Code oder Strichcode) */
+  async function decodePhoto(file, qr) {
+    var L = await loadImg(file), code = null, vs = variants(L.img), d = makeDetector(qr);
     if (d) { try { for (var i = 0; i < vs.length && !code; i++) { var r = await d.detect(vs[i]); if (r && r.length) code = r[0].rawValue; } } catch (e) {} }
     if (!code) {
       try {
-        await loadZxing(); var rd = makeReader();
+        await loadZxing(); var rd = makeReader(qr);
         for (var j = 0; j < vs.length && !code; j++) {
           var cands = [vs[j], rotate(vs[j])];
           for (var k = 0; k < cands.length && !code; k++) {
@@ -165,6 +167,19 @@ var Scanner = (function () {
     return c.toDataURL("image/jpeg", 0.72);
   }
 
-  return { start: start, stop: stop, running: running, torchSupported: torchSupported, setTorch: setTorch,
+  /* QR-Code als Bild (für die Kundenkarte an der Kasse): ganze Pixel je Modul, weißer Rand */
+  function qrSvg(text, size) {
+    return loadZxing().then(function () {
+      var Z = window.ZXing, m = Z.QRCodeEncoder.encode(text, Z.QRCodeDecoderErrorCorrectionLevel.M, new Map()).getMatrix();
+      var n = m.getWidth(), q = 4, mod = Math.max(2, Math.floor(size / (n + 2 * q))), px = mod * (n + 2 * q);
+      var c = document.createElement("canvas"); c.width = c.height = px;
+      var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, px, px); x.fillStyle = "#000";
+      for (var yy = 0; yy < n; yy++) for (var xx = 0; xx < n; xx++) if (m.get(xx, yy) === 1) x.fillRect((xx + q) * mod, (yy + q) * mod, mod, mod);
+      c.setAttribute("aria-label", "QR-Code der Kundenkarte");
+      return c;
+    });
+  }
+
+  return { qrSvg: qrSvg, start: start, stop: stop, running: running, torchSupported: torchSupported, setTorch: setTorch,
            decodePhoto: decodePhoto, makeThumb: makeThumb, beep: beep };
 })();

@@ -3,6 +3,13 @@
 Eine kleine Web-App für dein Handy. Alles läuft im Browser, deine Daten bleiben auf dem Gerät.
 
 ## Was sie kann
+- **Start (Dashboard):** Summe der aktiven Liste, alle Einkaufslisten, Anzahl erfasster Artikel, Ausgaben im Monat, letzter Einkauf, günstigster Markt für die Liste.
+- **Immer oben:** Markt-Auswahl (Dropdown), Suchleiste mit Vorschlägen (antippen = auf die Liste), ＋ für einen neuen Artikel. Unten in der Mitte: **Scannen** (Barcode → auf die Liste).
+- **Einkaufslisten:** mehrere Listen, Menge, abhaken („im Wagen“), Summe mit Pfand.
+- **Artikel-Seite:** alle erfassten Artikel mit Preisen je Markt, filtern, sortieren.
+- **Kassenbon-Vergleich:** Bon-Text einfügen, die App ordnet die Zeilen der Liste zu und zeigt teurer/günstiger, nicht geplant, vergessen. Neue Preise lassen sich übernehmen.
+- **Angebote:** Die Liste prüft Artikel mit Barcode automatisch in Open Prices (offene Preisdatenbank, in Deutschland gemeldete Angebote der letzten 3 Wochen). Eigene Angebote (Markt, Preis, gültig bis) trägst du im Artikel ein; sie zählen in Summe und Marktvergleich mit und verschwinden nach Ablauf. Dazu Such-Knöpfe für Marktguru und kaufDA.
+- **Statistik:** Ausgaben pro Monat und Markt, häufigste Artikel, Preisänderungen, Listenpreis je Markt.
 - **Live-Scan:** Kamera-Zeile unten, Barcode davorhalten, Piepton, fertig. Bekannte Artikel landen sofort im Wagen.
 - **Neuer Artikel:** Name, Foto und (wenn möglich) Pfand holt sich die App online aus Open Food Facts. Du tippst nur den Preis ein.
 - **Preise pro Markt:** Einmal eingegeben, beim nächsten Einkauf sofort da. Im Laden nur noch antippen, was in den Wagen kommt.
@@ -31,10 +38,12 @@ Im Ordner `python -m http.server 8000` ausführen und `http://localhost:8000` ö
 | `index.html` | Seitengerüst |
 | `style.css` | Aussehen (dunkel, hoher Kontrast) |
 | `js/data.js` | Märkte und die Artikel aus deinen Lidl-Bons |
-| `js/store.js` | Speichern, Sicherung, Artikel ohne Barcode nachtragen |
+| `js/ui.js` | Helfer (Geld, Text-Ähnlichkeit) |
+| `js/store.js` | Speichern, Listen, Einkäufe, Sicherung |
+| `js/compare.js` | Kassenbon einlesen und mit der Liste vergleichen |
 | `js/lookup.js` | Online-Suche (Open Food Facts) |
 | `js/scanner.js` | Live-Scan, Foto-Scan, Produktfoto |
-| `js/app.js` | Bedienung |
+| `js/app.js` | Seiten und Bedienung |
 | `js/zxing.min.js` | Barcode-Bibliothek für iPhones (Android braucht sie meist nicht) |
 | `sw.js`, `manifest.webmanifest`, `icon-*` | Offline-Betrieb und App-Symbol |
 

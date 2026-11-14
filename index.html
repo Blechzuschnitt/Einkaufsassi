@@ -12,35 +12,56 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <div id="err"></div>
 <header>
-  <div class="top"><b>Einkauf</b><span id="sync" class="grow" style="text-align:right"></span><button class="icon" id="menuBtn" type="button" aria-label="Menü">⚙︎</button></div>
-  <div class="stores" id="stores"></div>
+  <div class="top">
+    <b class="logo">Einkauf</b>
+    <button class="market" id="storeBtn" type="button" aria-label="Markt wählen" aria-haspopup="true"></button>
+    <button class="icon cardbtn" id="cardBtn" type="button" aria-label="Kundenkarte zeigen"><svg class="qri" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm1-9h2v2H6zm10 0h2v2h-2zM6 16h2v2H6zm7-3h2v2h-2zm2 2h2v2h-2zm-2 2h2v4h-2zm4-4h4v2h-4zm2 2h2v2h-2zm-2 2h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
+    <button class="icon" id="menuBtn" type="button" aria-label="Menü">⚙︎</button>
+  </div>
+  <div class="search">
+    <input type="search" id="q" placeholder="🔍 Artikel suchen → auf die Liste" autocomplete="off" enterkeyhint="go">
+    <button class="icon plusbtn" id="newBtn" type="button" aria-label="Neuen Artikel anlegen">＋</button>
+    <div id="sugg"></div>
+  </div>
 </header>
-<main id="list"></main>
+<main id="view"></main>
 
 <div class="dock">
-  <div id="strip"><video id="vid" playsinline muted></video><div class="line"></div><div class="hint2">Barcode vor die Linie halten</div><button id="torch" type="button" aria-label="Taschenlampe">🔦</button></div>
-  <div class="sum"><span id="cnt"></span><b id="sum"></b></div>
-  <div class="miss" id="missing"></div>
-  <div class="bar">
-    <button class="btn primary" id="liveBtn" type="button">📷 Scannen</button>
-    <label class="btn" for="pick" aria-label="Foto scannen">📸 Foto</label>
-    <button class="btn" id="typeBtn" type="button">123</button>
+  <div id="scanPanel">
+    <div id="strip"><video id="vid" playsinline muted></video><div class="line"></div><div class="hint2">Barcode vor die Linie halten</div><button id="torch" type="button" aria-label="Taschenlampe">🔦</button></div>
+    <div class="sbar">
+      <label class="btn" for="pick">📸 Foto</label>
+      <button class="btn" id="typeBtn" type="button">123 Nummer</button>
+      <button class="btn" id="scanClose" type="button">✕ Schließen</button>
+    </div>
   </div>
+  <div id="sumbar"></div>
+  <nav class="tabs">
+    <button type="button" data-tab="home"><i>🏠</i><span>Start</span></button>
+    <button type="button" data-tab="list"><i>📝</i><span>Liste</span></button>
+    <button type="button" class="scan" id="scanBtn"><i>▮▯▮</i><span>Scannen</span></button>
+    <button type="button" data-tab="items"><i>📦</i><span>Artikel</span></button>
+    <button type="button" data-tab="stats"><i>📊</i><span>Statistik</span></button>
+  </nav>
 </div>
 <input type="file" id="pick" class="hide" accept="image/*">
+<div id="cardView" role="dialog" aria-label="Kundenkarte"></div>
 
+<div id="storePop" role="dialog" aria-label="Markt wählen"></div>
 <div id="edit"></div>
 <div id="toast"></div>
 
-<script src="js/data.js"></script>
-<script src="js/store.js"></script>
-<script src="js/lookup.js"></script>
-<script src="js/scanner.js"></script>
-<script src="js/app.js"></script>
+<script src="js/data.js?v=8"></script>
+<script src="js/ui.js?v=8"></script>
+<script src="js/store.js?v=8"></script>
+<script src="js/lookup.js?v=8"></script>
+<script src="js/scanner.js?v=8"></script>
+<script src="js/compare.js?v=8"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>

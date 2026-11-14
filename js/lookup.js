@@ -39,5 +39,26 @@ var Lookup = (function () {
       return { name: name.slice(0, 80), imgUrl: p.image_front_small_url || "", deposit: depositGuess(p) };
     });
   }
-  return { byBarcode: byBarcode };
+  /* Angebote aus Open Prices (offene Preisdatenbank von Open Food Facts):
+     in den letzten 21 Tagen in Deutschland gemeldete reduzierte Preise → [{brand, city, price, was, date}] */
+  function offers(code) {
+    var since = new Date(Date.now() - 21 * 864e5).toISOString().slice(0, 10);
+    var url = "https://prices.openfoodfacts.org/api/v1/prices?product_code=" + encodeURIComponent(code) +
+      "&price_is_discounted=true&date__gte=" + since + "&order_by=-date&size=30";
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 8000);
+    return fetch(url, { signal: ctl.signal }).then(function (r) { clearTimeout(t); if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (j) {
+        var seen = {}, out = [];
+        (j.items || []).forEach(function (it) {
+          var loc = it.location || {}, c = String(loc.osm_address_country || "");
+          if (it.currency !== "EUR" || !/^(deutschland|germany)$/i.test(c) || it.price == null) return;
+          var brand = clean(loc.osm_brand || loc.osm_name || "Markt"), k = brand.toLowerCase();
+          if (seen[k]) return; seen[k] = 1;
+          out.push({ brand: brand, city: clean(loc.osm_address_city), price: Math.round(it.price * 100),
+            was: it.price_without_discount ? Math.round(it.price_without_discount * 100) : null, date: it.date });
+        });
+        return out;
+      });
+  }
+  return { byBarcode: byBarcode, offers: offers };
 })();
