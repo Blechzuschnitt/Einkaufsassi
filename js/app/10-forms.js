@@ -176,6 +176,8 @@ function openSimple(title, label, ph, mode, okText, okFn) {
 function openMenu() {
   var ms = state.stores.map(function (s, i) { return '<div class="kv mrow"><span>' + U.badge(s) + '</span><span class="mbtns"><button class="chip' + (state.cards[s] ? " on" : "") + '" data-card="' + i + '" type="button">' + (state.cards[s] ? "" + I("qr") + " Karte" : "＋ Karte") + '</button><button class="chip" data-del="' + i + '" type="button">entfernen</button></span></div>'; }).join("");
   openShell("Menü",
+    '<h3>Farbthema</h3><div class="themes" id="mTheme">' + [["", "EinkaufsAssi", "#c26bff", "#f6b81c"], ["gelb", "Neon-Gelb", "#ffe600", "#ffffff"], ["gruen", "Neon-Grün", "#39ff14", "#00e5ff"]].map(function (t) {
+      return '<button type="button" class="theme' + ((state.theme || "") === t[0] ? " on" : "") + '" data-t="' + t[0] + '"><span class="sw"><i style="background:' + t[2] + '"></i><i style="background:' + t[3] + '"></i></span>' + t[1] + "</button>"; }).join("") + "</div>" +
     '<h3>Funktionen</h3><div class="card" id="mFeat">' + FEATURES.map(function (f) {
       return '<label class="tog"><span><b>' + f[1] + "</b><small>" + f[2] + '</small></span><input type="checkbox" data-f="' + f[0] + '"' + (F(f[0]) ? " checked" : "") + '><i></i></label>'; }).join("") + "</div>" +
     "<h3>Märkte</h3><div class=\"card\">" + ms + '</div><div class="col" style="margin-top:8px"><button class="btn" id="mAdd" type="button">＋ Markt hinzufügen</button></div>' +
@@ -216,6 +218,8 @@ function openMenu() {
   });
   $("mSave").onclick = function () { doBackup(); msg("Sicherung wurde heruntergeladen.", "ok"); };
   $("mBud").onclick = function () { closeEdit(); askBudget(); };
+  $("mTheme").onclick = function (e) { var x = e.target.closest("[data-t]"); if (!x) return; state.theme = x.dataset.t; S.save(); applyTheme();
+    Array.prototype.forEach.call(this.querySelectorAll("[data-t]"), function (y) { y.classList.toggle("on", y === x); }); };
   $("mFeat").onchange = function (e) { var x = e.target; if (!x.dataset.f) return; if (!state.features) state.features = {}; state.features[x.dataset.f] = x.checked; S.save(); render(); };
   $("mLaunch").onclick = function (e) { var x = e.target.closest("[data-l]"); if (!x) return; state.launch = x.dataset.l; S.save();
     Array.prototype.forEach.call(this.querySelectorAll("[data-l]"), function (y) { y.classList.toggle("on", y === x); }); };
