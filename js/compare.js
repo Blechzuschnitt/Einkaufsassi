@@ -62,7 +62,7 @@ var Compare = (function () {
       '<label class="f">Kassenbon – eine Zeile pro Artikel: <i>Name Preis</i></label>' +
       '<textarea id="cTxt" rows="9" placeholder="Laugenstange 1,99\nMineralwasser 0,58\n2 x 0,29\nPfand 0,50\nSumme 3,07"></textarea>' +
       '<div class="hint">Text vom Bon abtippen oder einfügen (z. B. aus der Lidl-Plus-/Rewe-App oder per Text-Erkennung der Handy-Kamera kopiert). Mengenzeilen „2 x 0,29“, Pfand, Rabatte und „Summe“ werden erkannt.</div>' +
-      '<div class="col"><label class="btn ocr" for="cImg">📷 Bon fotografieren / Foto wählen</label>' +
+      '<div class="col"><label class="btn ocr" for="cImg">' + I("camera") + ' Bon fotografieren / Foto wählen</label>' +
       '<button class="btn" id="cFill" type="button">Abgehakte Artikel als Bon übernehmen</button>' +
       '<button class="btn primary" id="cGo" type="button" style="flex:none">Auswerten</button></div><div id="msg"></div><div id="cRes"></div>' +
       '<input type="file" id="cImg" class="hide" accept="image/*">');

@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
 <div id="err"></div>
@@ -21,12 +21,12 @@
     <b class="logo">Einkauf</b>
     <button class="market" id="storeBtn" type="button" aria-label="Markt wählen" aria-haspopup="true"></button>
     <button class="icon cardbtn" id="cardBtn" type="button" aria-label="Kundenkarte zeigen"><svg class="qri" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm1-9h2v2H6zm10 0h2v2h-2zM6 16h2v2H6zm7-3h2v2h-2zm2 2h2v2h-2zm-2 2h2v4h-2zm4-4h4v2h-4zm2 2h2v2h-2zm-2 2h2v2h-2zm2 2h2v2h-2zm-4 0h2v2h-2z"/></svg></button>
-    <button class="icon" id="menuBtn" type="button" aria-label="Menü">⚙︎</button>
+    <button class="icon" id="menuBtn" type="button" aria-label="Menü"><svg class="ic big" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button>
   </div>
   <div class="search">
-    <input type="search" id="q" placeholder="🔍 Artikel suchen → auf die Liste" autocomplete="off" enterkeyhint="go">
-    <button class="icon mic" id="micBtn" type="button" aria-label="Per Sprache hinzufügen" hidden>🎤</button>
-    <button class="icon plusbtn" id="newBtn" type="button" aria-label="Neuen Artikel anlegen">＋</button>
+    <input type="search" id="q" placeholder="Suchen → Liste" autocomplete="off" enterkeyhint="go">
+    <button class="icon mic" id="micBtn" type="button" aria-label="Per Sprache hinzufügen" hidden><svg class="ic big" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <button class="icon plusbtn" id="newBtn" type="button" aria-label="Neuen Artikel anlegen"><svg class="ic big" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
     <div id="sugg"></div>
   </div>
 </header>
@@ -35,16 +35,16 @@
 <div class="dock">
   <div id="scanPanel">
     <div class="smode" id="smode">
-      <button type="button" data-m="list">🛒 → Liste</button>
-      <button type="button" data-m="in">🥫 ＋ Vorrat</button>
-      <button type="button" data-m="out">🥫 − Verbraucht</button>
-      <button type="button" data-m="waste">🗑 Weggeworfen</button>
+      <button type="button" data-m="list"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11h10.8L21 7H6.2"/><circle cx="9.5" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg> Liste</button>
+      <button type="button" data-m="in"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v12H4z"/><path d="M12 2v9"/><path d="m8.5 7.5 3.5 3.5 3.5-3.5"/></svg> Einlagern</button>
+      <button type="button" data-m="out"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16v9H4z"/><path d="M12 15V3"/><path d="m8.5 6.5 3.5-3.5 3.5 3.5"/></svg> Verbraucht</button>
+      <button type="button" data-m="waste"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg> Weg&shy;geworfen</button>
     </div>
-    <div id="strip"><video id="vid" playsinline muted></video><div class="line"></div><div class="hint2">Barcode vor die Linie halten</div><button id="torch" type="button" aria-label="Taschenlampe">🔦</button></div>
+    <div id="strip"><video id="vid" playsinline muted></video><div class="line"></div><div class="hint2">Barcode vor die Linie halten</div><button id="torch" type="button" aria-label="Taschenlampe"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v5l-2 3v10h-4V11L8 8z"/><path d="M12 14v2"/></svg></button></div>
     <div class="sbar">
-      <label class="btn" for="pick">📸 Foto</label>
+      <label class="btn" for="pick"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg> Foto</label>
       <button class="btn" id="typeBtn" type="button">123 Nummer</button>
-      <button class="btn" id="scanClose" type="button">✕ Schließen</button>
+      <button class="btn" id="scanClose" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg> Schließen</button>
     </div>
   </div>
   <div id="sumbar"></div>
@@ -58,12 +58,28 @@
 <div id="edit"></div>
 <div id="toast"></div>
 
-<script src="js/data.js?v=21"></script>
-<script src="js/ui.js?v=21"></script>
-<script src="js/store.js?v=21"></script>
-<script src="js/lookup.js?v=21"></script>
-<script src="js/scanner.js?v=21"></script>
-<script src="js/compare.js?v=21"></script>
-<script src="js/app.js?v=21"></script>
+<script src="js/data.js?v=26"></script>
+<script src="js/ui.js?v=26"></script>
+<script src="js/store.js?v=26"></script>
+<script src="js/lookup.js?v=26"></script>
+<script src="js/scanner.js?v=26"></script>
+<script src="js/compare.js?v=26"></script>
+<script src="js/app/00-icons.js?v=26"></script>
+<script src="js/app/01-core.js?v=26"></script>
+<script src="js/app/02-header.js?v=26"></script>
+<script src="js/app/03-nav.js?v=26"></script>
+<script src="js/app/04-home.js?v=26"></script>
+<script src="js/app/05-list.js?v=26"></script>
+<script src="js/app/06-pantry.js?v=26"></script>
+<script src="js/app/07-items.js?v=26"></script>
+<script src="js/app/08-stats.js?v=26"></script>
+<script src="js/app/09-clicks.js?v=26"></script>
+<script src="js/app/10-forms.js?v=26"></script>
+<script src="js/app/11-cards.js?v=26"></script>
+<script src="js/app/12-scan.js?v=26"></script>
+<script src="js/app/14-shop.js?v=26"></script>
+<script src="js/app/15-extras.js?v=26"></script>
+<script src="js/app/16-notify.js?v=26"></script>
+<script src="js/app/13-main.js?v=26"></script>
 </body>
 </html>

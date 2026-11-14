@@ -453,3 +453,73 @@ small.pan,.hint.pan{color:var(--muted)}
 .fill b{font-size:13px;min-width:36px;text-align:left}
 .fill.low .fbar{border-color:var(--warn)}.fill.low .fbar i{background:var(--warn)}.fill.low b{color:var(--warn)}
 #ask .col .btn{min-height:48px}
+
+/* ---- Einkaufsmodus ---- */
+body.shopmode header{display:none}
+.shophead{display:flex;align-items:center;gap:10px;padding-top:calc(6px + env(safe-area-inset-top))}
+.shophead b{flex:1;font-size:18px}
+.shophead .btn{min-height:44px;font-size:15px}
+.shopsum{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.shopsum div{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column}
+.shopsum small{font-size:13px;color:var(--muted)}
+.shopsum b{font-size:28px;font-variant-numeric:tabular-nums}
+.shopsum div:first-child b{color:var(--accent)}
+.shoprow{width:100%;text-align:left;color:var(--ink);min-height:72px;gap:12px;cursor:pointer}
+.shoprow .sq{flex:none;min-width:34px;font-size:20px;font-weight:800;color:var(--accent)}
+.shoprow .sn{flex:1;font-size:21px;font-weight:700;line-height:1.25}
+.shoprow .sp{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.shoprow.in{min-height:48px;opacity:.55}.shoprow.in .sn{font-size:16px;text-decoration:line-through}
+.shopdone{text-align:center;font-size:24px;font-weight:800;color:var(--accent);padding:24px 0 8px}
+/* ---- Hinweise ---- */
+.note.split{border-left-color:var(--ink)}
+.note.re{border-left-color:var(--info)}
+.note.alarm{border-left-color:var(--accent)}
+.note .kv.s{border-top:1px solid var(--line)}
+.note .chip{padding:5px 10px;font-size:13px}
+.btn.sm{min-height:40px;font-size:14px;padding:0 12px}
+.btn.recipe{width:100%;margin:8px 0 4px;border-color:var(--line)}
+.chip.tpl.on{background:var(--accent);border-color:var(--accent);color:#000}
+#tpls .kv{gap:8px}#tpls .chip.tpl{flex:1;text-align:left}
+/* ---- Nährwerte ---- */
+.ns{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;font-size:11px;font-weight:900;color:#fff;margin-right:6px;vertical-align:1px}
+.ns.big{width:30px;height:30px;font-size:17px;border-radius:7px;margin:0}
+/* ---- Lagerorte ---- */
+.locchips{grid-template-columns:repeat(auto-fit,minmax(68px,1fr))}
+.addloc{display:grid;grid-template-columns:64px 1fr 54px;gap:6px;margin-top:8px}
+.addloc input{min-width:0;padding:10px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-size:16px}
+.addloc select{padding-right:22px}
+.addloc .btn{min-height:46px;padding:0}
+
+/* ---- Symbole im Text ---- */
+.ic{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:none}
+.ic.big{width:22px;height:22px;vertical-align:middle}
+.btn .ic{margin-right:6px}
+.icon{display:grid;place-items:center}
+.plusbtn .ic{width:26px;height:26px;stroke-width:2.6}
+.smode button{display:flex;align-items:center;justify-content:center;gap:4px}
+.smode .ic{width:16px;height:16px}
+#torch{display:none;place-items:center}#torch .ic{width:20px;height:20px}
+.sbar .btn .ic{margin-right:4px}
+.note > .ic:first-child,.note > b:first-child{vertical-align:-.2em}
+.locbtn{display:grid;place-items:center;color:var(--muted)}
+.locbtn .ic{width:20px;height:20px}
+.lochead .ic{color:var(--muted)}
+.lc span{display:flex;align-items:center;gap:4px}
+.lc .ic{width:16px;height:16px}
+.photo .pv .ic{width:40px;height:40px;color:var(--muted)}
+.tag .ic{width:12px;height:12px;vertical-align:-1px}
+.caret .ic{width:16px;height:16px;color:var(--accent)}
+.tabs > button.area .aswap{display:grid;place-items:center}
+.tabs > button.area .aswap .ic{width:12px;height:12px}
+/* ---- Markt-Abzeichen: Pille mit Farbpunkt ---- */
+.mk{display:inline-flex;align-items:center;gap:6px;font-weight:700;letter-spacing:0;text-transform:none;background:var(--card2);color:var(--ink);
+  border:1px solid var(--line);border-radius:999px;padding:1px 9px 1px 7px;font-size:13px;line-height:1.5;box-shadow:none;vertical-align:middle;white-space:nowrap}
+.mk i{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.mk.xs{font-size:11px;padding:0 7px 0 5px;gap:4px}.mk.xs i{width:7px;height:7px}
+.mk.sm{font-size:12px}
+.mk.big{font-size:16px;padding:5px 14px 5px 11px;min-width:0;border-radius:999px;gap:8px}.mk.big i{width:11px;height:11px}
+.mopt .mk.big{width:auto}
+.tolist,.waste{display:grid;place-items:center;color:var(--muted)}
+.tolist .ic{width:18px;height:18px}
+.tolist.on{color:var(--accent);border-color:var(--accent);background:transparent}
+.addloc{grid-template-columns:110px 1fr 54px}

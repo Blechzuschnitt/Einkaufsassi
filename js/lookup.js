@@ -1,7 +1,7 @@
 /* Produktdaten aus Open Food Facts (kostenlose, offene Datenbank) anhand des Barcodes.
    Liefert Name, Foto und – wenn erkennbar – einen Pfand-Vorschlag. Preise gibt es dort nicht. */
 var Lookup = (function () {
-  var FIELDS = "product_name,product_name_de,generic_name_de,brands,quantity,image_front_small_url,categories_tags,packaging_tags";
+  var FIELDS = "product_name,product_name_de,generic_name_de,brands,quantity,image_front_small_url,categories_tags,packaging_tags,nutriscore_grade,nutriments";
   var DRINKS = ["en:waters", "en:sodas", "en:beers", "en:carbonated-drinks", "en:energy-drinks", "en:iced-teas",
     "en:soft-drinks", "en:non-alcoholic-beverages", "en:lemonades", "en:colas", "en:mineral-waters", "en:spring-waters", "en:wines", "en:ciders"];
 
@@ -39,7 +39,11 @@ var Lookup = (function () {
       var cats = p.categories_tags || [], loc = "";
       if (has(cats, ["en:frozen-foods", "en:frozen-desserts", "en:ice-creams-and-sorbets", "en:frozen-pizzas", "en:frozen-vegetables"])) loc = "tk";
       else if (has(cats, ["en:dairies", "en:cheeses", "en:yogurts", "en:meats", "en:fresh-foods", "en:chilled-foods", "en:hams", "en:sausages", "en:fishes", "en:eggs", "en:butters"])) loc = "kuehl";
-      return { name: name.slice(0, 80), imgUrl: p.image_front_small_url || "", deposit: depositGuess(p), loc: loc };
+      var nm = p.nutriments || {}, num = function (k) { var v = parseFloat(nm[k]); return isFinite(v) ? v : null; };
+      var g = String(p.nutriscore_grade || "").toLowerCase(), nutri = null;
+      if (/^[a-e]$/.test(g) || num("energy-kcal_100g") != null)
+        nutri = { g: /^[a-e]$/.test(g) ? g : "", kcal: num("energy-kcal_100g"), sugar: num("sugars_100g"), fat: num("fat_100g"), prot: num("proteins_100g"), salt: num("salt_100g") };
+      return { name: name.slice(0, 80), imgUrl: p.image_front_small_url || "", deposit: depositGuess(p), loc: loc, nutri: nutri };
     });
   }
   /* Angebote aus Open Prices (offene Preisdatenbank von Open Food Facts):

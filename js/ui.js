@@ -49,9 +49,10 @@ var U = (function () {
     var h = 0; for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
     return POOL[h % POOL.length];
   }
+  /* Markt-Abzeichen: schlichte Pille mit Farbpunkt in der Kettenfarbe */
   function badge(name, cls) {
-    var c = brandOf(name), label = String(name);
-    return '<span class="mk' + (cls ? " " + cls : "") + '" style="background:' + c[0] + ";color:" + c[1] + (c[2] ? ";box-shadow:inset 0 -3px 0 " + c[2] : "") + '">' + esc(label) + "</span>";
+    var c = brandOf(name), dot = c[0] === "#ffffff" ? c[1] : c[0];
+    return '<span class="mk' + (cls ? " " + cls : "") + '"><i style="background:' + dot + '"></i>' + esc(name) + "</span>";
   }
   return { badge: badge, brandOf: brandOf, $: $, esc: esc, money: money, signed: signed, cents2str: cents2str, parsePrice: parsePrice, toast: toast, day: day, norm: norm, sim: sim };
 })();

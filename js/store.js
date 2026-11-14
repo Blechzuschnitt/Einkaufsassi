@@ -56,7 +56,11 @@ var Store = (function () {
     if (!state.route) state.route = {};
     if (!state.outlog) state.outlog = [];       // Auslagerungen: {b, n, q, d, w (weggeworfen), v (Wert in Cent), loc}          // Laufweg je Markt: {Markt: {key: 0…1}}
     if (!state.firstUse) state.firstUse = Date.now();
-    if (state.budget == null) state.budget = 0;  // Monatsbudget in Cent, 0 = keins   // Vorrat: {key: [{q, d, src}]} – Einlagerungen mit Datum   // Kundenkarten: {Markt: {code, d}} – nur auf diesem Gerät
+    if (state.budget == null) state.budget = 0;  // Monatsbudget in Cent, 0 = keins
+    if (!state.templates) state.templates = [];   // Listen-Vorlagen: [{id, name, items:[{b, qty}]}]
+    if (!state.locs) state.locs = LOCS.slice();   // Lagerorte (die ersten drei fest, weitere selbst angelegt)
+    var EM = { "🥫": "jar", "🥛": "milk", "🧊": "snow", "📦": "box", "🧺": "basket", "🍷": "bottle", "🏠": "home", "🚪": "door" };
+    state.locs.forEach(function (l) { if (EM[l.i]) l.i = EM[l.i]; });   // Vorrat: {key: [{q, d, src}]} – Einlagerungen mit Datum   // Kundenkarten: {Markt: {code, d}} – nur auf diesem Gerät
     if (state.v !== 3) {
       var cart = state.cart || {};
       Object.keys(cart).forEach(function (st) {
@@ -175,11 +179,15 @@ var Store = (function () {
   }
 
   /* ----- Lagerort: trocken | kuehl | tk ----- */
-  var LOCS = [{ k: "trocken", t: "Trocken", i: "🥫" }, { k: "kuehl", t: "Kühlschrank", i: "🥛" }, { k: "tk", t: "Gefrierschrank", i: "🧊" }];
+  var LOCS = [{ k: "trocken", t: "Trocken", i: "jar" }, { k: "kuehl", t: "Kühlschrank", i: "milk" }, { k: "tk", t: "Gefrierschrank", i: "snow" }];
   var TK = /(tiefk[uü]hl|\btk\b|gefrier|\beis\b|eiscreme|pizza|pommes|fischst[aä]bchen|frozen)/i;
   var KUEHL = /(milch(?!schoko)|joghurt|quark|k[aä]se|butter|sahne|schmand|wurst|salami|schinken|fleisch|h[aä]hn|geschnetzel|cordon|antipasti|\beier\b|tofu|hack|lachs|aufschnitt|s[oö]derg[aå]rden|remoulade|feinkost|salat\b)/i;
   function guessLoc(name) { return TK.test(name || "") ? "tk" : KUEHL.test(name || "") ? "kuehl" : "trocken"; }
-  function locOf(b) { var p = products[b]; return p && p.loc || guessLoc(p && p.name); }
+  function locOf(b) {
+    var p = products[b], k = p && p.loc;
+    if (k && state.locs.some(function (l) { return l.k === k; })) return k;
+    return guessLoc(p && p.name);
+  }
 
   /* ----- Vorrat (zu Hause) ----- */
   function pantryOf(b) {
@@ -290,6 +298,8 @@ var Store = (function () {
     (s.purchases || []).forEach(function (pu) { if (!state.purchases.some(function (x) { return x.id === pu.id; })) state.purchases.push(pu); });
     (s.outlog || []).forEach(function (o) { if (!state.outlog.some(function (x) { return x.d === o.d && x.b === o.b; })) state.outlog.push(o); });
     Object.keys(s.pantry || {}).forEach(function (b) { if (!state.pantry[b] && products[b]) state.pantry[b] = s.pantry[b]; });
+    (s.templates || []).forEach(function (t) { if (!state.templates.some(function (x) { return x.id === t.id; })) state.templates.push(t); });
+    (s.locs || []).forEach(function (l) { if (!state.locs.some(function (x) { return x.k === l.k; })) state.locs.push(l); });
     Object.keys(s.cards || {}).forEach(function (st) { if (!state.cards[st]) state.cards[st] = s.cards[st]; });
     (s.seeded || []).forEach(function (id) { if (state.seeded.indexOf(id) < 0) state.seeded.push(id); });
     state.purchases.sort(function (a, b) { return a.date - b.date; });
@@ -303,7 +313,7 @@ var Store = (function () {
     priceOf: priceOf, effPrice: effPrice, setPrice: setPrice, today: today,
     offersOf: offersOf, offerAt: offerAt, addOffer: addOffer, removeOffer: removeOffer, matchStore: matchStore, newKey: newKey, rekey: rekey, removeProduct: removeProduct, eachListItem: eachListItem,
     listById: listById, activeList: activeList, newList: newList, removeList: removeList, addToList: addToList,
-    LOCS: LOCS, locOf: locOf, guessLoc: guessLoc,
+    get LOCS() { return state.locs || LOCS; }, locOf: locOf, guessLoc: guessLoc,
     setExp: setExp, learnRoute: learnRoute,
     pantryOf: pantryOf, pantryAdd: pantryAdd, pantryTake: pantryTake, pantryClear: pantryClear,
     totals: totals, storeCompare: storeCompare,

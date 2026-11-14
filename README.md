@@ -15,6 +15,9 @@ Eine kleine Web-App für dein Handy. Alles läuft im Browser, deine Daten bleibe
 - **Spracheingabe:** 🎤 neben der Suche – z. B. „Milch, zwei Butter und Eier“ (Chrome/Android; die Spracherkennung läuft über den Dienst des Browsers).
 - **Bon per Foto:** Beim Kassenbon-Vergleich „📷 Bon fotografieren“ – Texterkennung (Tesseract.js, wird beim ersten Mal aus dem Netz geladen). Ergebnis bitte kurz prüfen.
 - **Preisverlauf** je Artikel und Markt als kleines Diagramm, **Monatsbudget** auf Start und Statistik, **Sicherungs-Erinnerung** nach 7 Tagen.
+- **Einkaufsmodus:** Liste → „🛒 Einkaufsmodus starten“: große Anzeige, nur offene Artikel nach Laufweg, Scannen hakt ab, Bildschirm bleibt an.
+- **Aufteilen:** Die Liste zeigt, ob sich mehrere Märkte lohnen, und teilt sie auf Wunsch in Listen je Markt.
+- **Nachkauf-Vorschläge, Rezeptideen (Chefkoch) für bald Ablaufendes, Vorlagen, Preisalarm, Nährwerte (Open Food Facts), eigene Lagerorte, MHD-Benachrichtigung** (im Hintergrund nur als installierte App in Chrome/Android).
 - **Statistik:** Ausgaben pro Monat und Markt, häufigste Artikel, Preisänderungen, Listenpreis je Markt.
 - **Live-Scan:** Kamera-Zeile unten, Barcode davorhalten, Piepton, fertig. Bekannte Artikel landen sofort im Wagen.
 - **Neuer Artikel:** Name, Foto und (wenn möglich) Pfand holt sich die App online aus Open Food Facts. Du tippst nur den Preis ein.
@@ -49,7 +52,7 @@ Im Ordner `python -m http.server 8000` ausführen und `http://localhost:8000` ö
 | `js/compare.js` | Kassenbon einlesen und mit der Liste vergleichen |
 | `js/lookup.js` | Online-Suche (Open Food Facts) |
 | `js/scanner.js` | Live-Scan, Foto-Scan, Produktfoto |
-| `js/app.js` | Seiten und Bedienung |
+| `js/app/*.js` | Seiten und Bedienung, nach Themen aufgeteilt (Kopf, Navigation, Start, Liste, Vorrat, Artikel, Statistik, Formulare, Kundenkarten, Scannen, Einkaufsmodus, Extras, Benachrichtigung) |
 | `js/zxing.min.js` | Barcode-Bibliothek für iPhones (Android braucht sie meist nicht) |
 | `sw.js`, `manifest.webmanifest`, `icon-*` | Offline-Betrieb und App-Symbol |
 
