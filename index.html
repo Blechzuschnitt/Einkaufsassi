@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Einkauf</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="err"></div>
+<header>
+  <div class="top"><b>Einkauf</b><span id="sync" class="grow" style="text-align:right"></span><button class="icon" id="menuBtn" type="button" aria-label="Menü">⚙︎</button></div>
+  <div class="stores" id="stores"></div>
+</header>
+<main id="list"></main>
+
+<div class="dock">
+  <div id="strip"><video id="vid" playsinline muted></video><div class="line"></div><div class="hint2">Barcode vor die Linie halten</div><button id="torch" type="button" aria-label="Taschenlampe">🔦</button></div>
+  <div class="sum"><span id="cnt"></span><b id="sum"></b></div>
+  <div class="miss" id="missing"></div>
+  <div class="bar">
+    <button class="btn primary" id="liveBtn" type="button">📷 Scannen</button>
+    <label class="btn" for="pick" aria-label="Foto scannen">📸 Foto</label>
+    <button class="btn" id="typeBtn" type="button">123</button>
+  </div>
+</div>
+<input type="file" id="pick" class="hide" accept="image/*">
+
+<div id="edit"></div>
+<div id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/lookup.js"></script>
+<script src="js/scanner.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

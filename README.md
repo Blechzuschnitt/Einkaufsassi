@@ -1,1 +1,44 @@
-# Einkaufsassi
+# Einkauf – Barcode scannen, Preise merken, Wagensumme sehen
+
+Eine kleine Web-App für dein Handy. Alles läuft im Browser, deine Daten bleiben auf dem Gerät.
+
+## Was sie kann
+- **Live-Scan:** Kamera-Zeile unten, Barcode davorhalten, Piepton, fertig. Bekannte Artikel landen sofort im Wagen.
+- **Neuer Artikel:** Name, Foto und (wenn möglich) Pfand holt sich die App online aus Open Food Facts. Du tippst nur den Preis ein.
+- **Preise pro Markt:** Einmal eingegeben, beim nächsten Einkauf sofort da. Im Laden nur noch antippen, was in den Wagen kommt.
+- **Pfand** wird automatisch zur Summe addiert.
+- **Offline:** Nach dem ersten Öffnen läuft die App auch ohne Netz (nur die Online-Namenssuche braucht Netz).
+- **Sicherung:** Menü ⚙︎ → Sicherung speichern oder kopieren, später wieder laden.
+
+## Wichtig: Die Kamera braucht https
+Öffnest du die Dateien direkt vom Handy-Speicher, geht die Kamera nicht. Die App muss über eine https-Adresse laufen.
+
+### Weg 1 – Netlify Drop (ca. 2 Minuten, kein Konto nötig)
+1. Am PC https://app.netlify.com/drop öffnen.
+2. Den **ganzen Ordner** `Einkaufen` auf die Seite ziehen.
+3. Du bekommst eine Adresse wie `https://irgendwas.netlify.app`. Die am Handy öffnen.
+4. Browser-Menü → **„Zum Startbildschirm hinzufügen“**. Danach startet sie wie eine App.
+
+### Weg 2 – GitHub Pages
+Ordnerinhalt in ein GitHub-Repository legen, unter *Settings → Pages* den Hauptzweig aktivieren.
+
+### Nur zum Ausprobieren am PC
+Im Ordner `python -m http.server 8000` ausführen und `http://localhost:8000` öffnen (Webcam des PCs).
+
+## Dateien
+| Datei | Inhalt |
+|---|---|
+| `index.html` | Seitengerüst |
+| `style.css` | Aussehen (dunkel, hoher Kontrast) |
+| `js/data.js` | Märkte und die Artikel aus deinen Lidl-Bons |
+| `js/store.js` | Speichern, Sicherung, Artikel ohne Barcode nachtragen |
+| `js/lookup.js` | Online-Suche (Open Food Facts) |
+| `js/scanner.js` | Live-Scan, Foto-Scan, Produktfoto |
+| `js/app.js` | Bedienung |
+| `js/zxing.min.js` | Barcode-Bibliothek für iPhones (Android braucht sie meist nicht) |
+| `sw.js`, `manifest.webmanifest`, `icon-*` | Offline-Betrieb und App-Symbol |
+
+## Grenzen
+- Preise gibt es online nicht verlässlich, die gibst du selbst ein.
+- Open Food Facts kennt nicht jeden Artikel, vor allem Eigenmarken. Dann tippst du den Namen selbst.
+- Der Pfand-Vorschlag ist eine Schätzung, bitte kurz prüfen.
