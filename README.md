@@ -1,4 +1,4 @@
-# Einkauf – Barcode scannen, Preise merken, Wagensumme sehen
+# EinkaufsAssi – Einkaufsliste, Preise, Vorrat
 
 Eine kleine Web-App für dein Handy. Alles läuft im Browser, deine Daten bleiben auf dem Gerät.
 

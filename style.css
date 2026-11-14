@@ -1,4 +1,4 @@
-:root{--bg:#000;--card:#111;--card2:#1c1c1c;--ink:#fff;--muted:#c4c4c4;--line:#3a3a3a;--accent:#ffe600;--accent-ink:#000;--ok:#4ade80;--bad:#ff5c5c;--good:#4ade80;
+:root{--bg:#000;--card:#111;--card2:#1c1c1c;--ink:#fff;--muted:#c4c4c4;--line:#3a3a3a;--accent:#c26bff;--accent-ink:#000;--ok:#4ade80;--bad:#ff5c5c;--good:#4ade80;
   --offer:#ffd60a;--pantry:#ff4fd8;--dry:#ffb020;--cool:#00e5ff;--frz:#8fb8ff;--info:#00e5ff;--items:#ff9f1c;--bon:#c77dff;--warn:#ff9f1c;--pc:var(--accent)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -29,7 +29,7 @@ select:focus{outline:none;border-color:var(--accent)}
 #sugg{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--card2);border:2px solid var(--accent);border-radius:14px;overflow:hidden;max-height:60vh;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.8)}
 #sugg.open{display:block}
 .sg{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:10px 12px;min-height:54px}
-.sg.first{background:#2a2600}
+.sg.first{background:#241431}
 .sg .sn{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sg .sp{font-variant-numeric:tabular-nums;font-weight:700}
 .sg .plus{color:var(--accent);font-weight:700;font-size:20px}
@@ -45,9 +45,9 @@ main{padding:8px 14px}
 .kv.s{font-size:15px;padding:5px 0;border-top:1px solid var(--line)}
 .kv.s:first-child{border-top:0}
 .card.total .kv b{font-size:26px;font-variant-numeric:tabular-nums}
-.note{background:#2a2600;border:2px solid #6b6000;border-radius:14px;padding:10px 12px;font-size:14px;margin:10px 0;line-height:1.5}
+.note{background:#241431;border:2px solid #5a2d80;border-radius:14px;padding:10px 12px;font-size:14px;margin:10px 0;line-height:1.5}
 
-.hero{background:linear-gradient(160deg,#2a2600,#000 70%);border:2px solid var(--accent);border-radius:18px;padding:16px;margin:6px 0 10px;cursor:pointer}
+.hero{background:linear-gradient(160deg,#241431,#000 70%);border:2px solid var(--accent);border-radius:18px;padding:16px;margin:6px 0 10px;cursor:pointer}
 .hero .k{font-size:13px;color:var(--muted)}
 .hero .big{font-size:44px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;margin:4px 0 0;line-height:1.1}
 .quick{display:flex;gap:8px}
@@ -71,7 +71,7 @@ main{padding:8px 14px}
 .sep{font-size:13px;color:var(--accent);margin:16px 2px 4px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 
 .row{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px;margin:7px 0;min-height:64px}
-.row.in{border-color:#6b6000;opacity:.75}
+.row.in{border-color:#5a2d80;opacity:.75}
 .row.in .name{text-decoration:line-through}
 .tick{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--muted);background:transparent;display:grid;place-items:center;font-size:18px;font-weight:800;color:var(--accent-ink);padding:0}
 .row.in .tick{background:var(--accent);border-color:var(--accent)}
@@ -120,7 +120,7 @@ label.check input{width:22px;height:22px;accent-color:var(--accent);flex:none}
 .tabs button i{font-style:normal;font-size:21px;line-height:1.1}
 .tabs button.on{color:var(--accent)}
 .tabs .scan{margin-top:-18px}
-.tabs .scan i{background:var(--accent);color:var(--accent-ink);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:900;letter-spacing:-2px;box-shadow:0 0 0 4px var(--bg),0 0 18px rgba(255,230,0,.45)}
+.tabs .scan i{background:var(--accent);color:var(--accent-ink);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:900;letter-spacing:-2px;box-shadow:0 0 0 4px var(--bg),0 0 18px rgba(194,107,255,.45)}
 .tabs .scan span{color:var(--accent);font-weight:700}
 .tabs .scan.on i{background:var(--bad)}
 
@@ -174,7 +174,7 @@ body.scanning #toast{bottom:calc(300px + env(safe-area-inset-bottom))}
 /* Angebote */
 .tag{display:inline-block;color:var(--accent-ink);background:var(--accent);border-radius:6px;padding:0 6px;font-size:12px;font-weight:700;margin-top:3px}
 .row.deal{border-color:var(--accent)}
-.row.in.deal{border-color:#6b6000}
+.row.in.deal{border-color:#5a2d80}
 .note.deal{cursor:pointer;border-color:var(--accent)}
 .offbar{margin:10px 0}
 .offbar .btn{width:100%;min-height:46px;font-size:15px}
@@ -201,7 +201,7 @@ body.scanning #toast{bottom:calc(300px + env(safe-area-inset-bottom))}
 .p-stats .bar .bt i{background:var(--bon)}
 .p-items .addb{border-color:var(--items);color:var(--items)}.p-items .addb.on{background:var(--items);color:#000}
 .p-items .ihead input:focus{border-color:var(--items)}
-.note{background:#06222a;border-color:#0b6b80}
+.note{background:#1a1424;border-color:#4a3a5e}
 .note.deal{background:#2a2400;border-color:var(--offer)}
 .tag{background:var(--offer);color:#000}
 .row.deal{border-color:var(--offer)}
@@ -256,7 +256,7 @@ body.scanning #toast{bottom:calc(300px + env(safe-area-inset-bottom))}
 .p-pantry .row{border-left:5px solid var(--pantry)}
 .p-pantry .row.old{border-left-color:var(--warn)}
 .tolist{width:40px;height:34px;border-radius:10px;border:2px solid var(--line);background:transparent;font-size:17px;padding:0}
-.tolist.on{border-color:var(--accent);background:#2a2600}
+.tolist.on{border-color:var(--accent);background:#241431}
 small.pan,.hint.pan{color:var(--pantry)}
 .btn.finish{border-color:var(--pantry);color:var(--pantry)}
 .smode{display:flex;gap:6px;margin-bottom:8px}
@@ -307,7 +307,7 @@ small.pan,.hint.pan{color:var(--pantry)}
 /* ---- MHD ---- */
 .mhd{display:inline-block;margin-top:4px;border-radius:8px;padding:2px 8px;font-size:13px;font-weight:800;border:2px solid var(--line);background:transparent;color:var(--ink)}
 .mhd.none{color:var(--muted);font-weight:600;border-style:dashed}
-.mhd.ok{border-color:#6b6000;color:var(--good)}
+.mhd.ok{border-color:#5a2d80;color:var(--good)}
 .mhd.warn{background:var(--warn);border-color:var(--warn);color:#000}
 .mhd.bad{background:var(--bad);border-color:var(--bad);color:#000}
 .note.exp{background:#2a1500;border-color:var(--warn);cursor:pointer}
@@ -555,3 +555,58 @@ body.shopmode header{display:none}
 #launch.onb{align-items:flex-start;overflow:auto}
 #launch.onb .lq small{display:block;font-size:13px;margin-top:4px}
 #launch.onb .card{margin-bottom:6px}
+
+/* ---- Name + Logo ---- */
+.logo{display:flex;align-items:center;gap:8px;min-width:0}
+.logo img{width:36px;height:36px;border-radius:50%;flex:none;object-fit:cover}
+.logo b{font-size:19px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;color:var(--ink)}
+.logo b span{color:#c77dff}
+.market small{display:none}
+#launch .llogo{display:block;width:min(62vw,240px);height:auto;margin:0 auto 6px}
+#launch .llogo.sm{width:min(40vw,150px)}
+#launch.onb .ltitle{font-size:24px}
+@media (max-width:360px){.logo b{font-size:16px}.logo img{width:30px;height:30px}}
+
+/* =================================================================
+   Farben aus dem Logo: Neon-Lila als Akzent, Gold für das Lager,
+   tiefes Violett-Schwarz als Grund. Hoher Kontrast bleibt.
+   ================================================================= */
+:root{--bg:#07050a;--card:#141019;--card2:#1e1726;--line:#3a2f47;--muted:#bdb3c9;
+  --accent:#c26bff;--accent-ink:#000;--gold:#f6b81c;--bon:#f6b81c;--info:#7fd4ff}
+html,body,header,.dock,#edit,#launch,#storePop .mgrid{background-color:var(--bg)}
+header,.dock{border-color:var(--line)}
+.logo b span,.logo b{text-shadow:0 0 12px rgba(194,107,255,.35)}
+.logo b span{color:var(--accent)}
+.logo img{box-shadow:0 0 0 2px var(--accent),0 0 14px rgba(194,107,255,.5)}
+/* Hauptknöpfe: Lila mit schwarzer Schrift, leichter Neon-Schein */
+.btn.primary,.plusbtn{background:var(--accent);border-color:var(--accent);color:#000;box-shadow:0 0 14px rgba(194,107,255,.35)}
+.hero .big,#sumbar .sv,.shopsum div:first-child b{color:var(--accent);text-shadow:0 0 18px rgba(194,107,255,.45)}
+.hero{border-color:#4a3a5e;background:linear-gradient(160deg,#1e1328,var(--card) 70%)}
+/* Untere Leiste: Einkaufen = Lila, Lager = Gold (Krone im Logo) */
+.tabs > button.on,.tabs [data-tab].on{color:var(--accent)}
+.tabs > button.area .aico{background:var(--accent);box-shadow:0 0 16px rgba(194,107,255,.55)}
+.tabs > button.area{color:var(--accent)}
+.tabs > button.area.lager .aico{background:var(--gold);box-shadow:0 0 16px rgba(246,184,28,.5)}
+.tabs > button.area.lager{color:var(--gold)}
+.p-pantry .tabs > button.on{color:var(--gold)}
+body:has(.p-pantry) .tabs > button.on{color:var(--gold)}
+#launch .lopt[data-k=pantry] .li{background:var(--gold)}
+#launch .lopt:first-of-type{border-color:var(--accent);box-shadow:0 0 18px rgba(194,107,255,.25)}
+/* Schalter, Auswahl, Fortschritt */
+.tog input:checked + i{background:var(--accent);border-color:var(--accent)}
+.lc.on{background:var(--gold);border-color:var(--gold);color:#000}
+.mopt.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset,0 0 14px rgba(194,107,255,.3)}
+.bar .bt i,.p-stats .bar .bt i,.bbar i{background:var(--accent)!important}
+.card.budget .bbar i{background:var(--good)!important}
+.card.budget.warn .bbar i{background:var(--warn)!important}.card.budget.bad .bbar i{background:var(--bad)!important}
+.note.alarm{border-left-color:var(--accent)}
+.note.re{border-left-color:var(--gold)}
+.fbar i{background:var(--ink)}
+input[type=text]:focus,textarea:focus,#q:focus,select:focus{border-color:var(--accent)}
+#sugg{border-color:var(--accent)}
+.sg.first{background:#241431}
+.caret .ic{color:var(--accent)}
+.smode button.on{background:var(--accent);border-color:var(--accent)}
+.smode button[data-m=in].on,.smode button[data-m=out].on{background:var(--gold);border-color:var(--gold)}
+#strip{border-color:var(--accent)}
+#strip[data-mode=in],#strip[data-mode=out]{border-color:var(--gold)}

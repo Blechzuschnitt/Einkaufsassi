@@ -14,7 +14,7 @@ function launchTo(k) {
 }
 function showLaunch() {
   var d = document.createElement("div"); d.id = "launch"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Wohin möchtest du?");
-  d.innerHTML = '<div class="lwrap"><div class="ltitle">Einkauf</div><div class="lq">Wohin möchtest du?</div>' +
+  d.innerHTML = '<div class="lwrap"><img class="llogo" src="logo.webp" alt="EinkaufsAssi" width="220" height="220"><div class="lq">Wohin möchtest du?</div>' +
     LAUNCH.map(function (x) { return '<button type="button" class="lopt" data-k="' + x.k + '"><span class="li">' + ico(IC[x.i], 2) + '</span><span class="lt"><b>' + x.t + "</b><small>" + x.sub() + "</small></span></button>"; }).join("") +
     '<label class="check lremember"><input type="checkbox" id="lRem"> Merken und beim nächsten Mal direkt dorthin</label></div>';
   document.body.appendChild(d);
@@ -27,7 +27,7 @@ function showLaunch() {
 /* Erster Start: Funktionen auswählen (später im Menü änderbar) */
 function showOnboard(next) {
   var d = document.createElement("div"); d.id = "launch"; d.className = "onb"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Willkommen");
-  d.innerHTML = '<div class="lwrap"><div class="ltitle">Willkommen</div><div class="lq">Welche Funktionen möchtest du nutzen?<br><small>Du kannst das jederzeit im Menü unter „Funktionen“ ändern.</small></div>' +
+  d.innerHTML = '<div class="lwrap"><img class="llogo sm" src="logo.webp" alt="EinkaufsAssi" width="150" height="150"><div class="ltitle">Willkommen beim EinkaufsAssi</div><div class="lq">Welche Funktionen möchtest du nutzen?<br><small>Du kannst das jederzeit im Menü unter „Funktionen“ ändern.</small></div>' +
     '<div class="card" id="oFeat">' + FEATURES.map(function (f) {
       return '<label class="tog"><span><b>' + f[1] + "</b><small>" + f[2] + '</small></span><input type="checkbox" data-f="' + f[0] + '"' + (F(f[0]) ? " checked" : "") + "><i></i></label>"; }).join("") + "</div>" +
     '<div class="col"><button class="btn primary" id="oGo" type="button" style="flex:none">Los geht’s</button></div></div>';
