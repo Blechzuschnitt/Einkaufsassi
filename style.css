@@ -628,3 +628,11 @@ input[type=text]:focus,textarea:focus,#q:focus,select:focus{border-color:var(--a
 .theme.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
 .theme .sw{display:flex;gap:4px}
 .theme .sw i{width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.3)}
+
+/* ---- Erststart: Konto ---- */
+#launch .amsg{display:none;margin-top:10px;padding:10px;border-radius:10px;font-weight:600;font-size:14px}
+#launch .amsg.ok{display:block;background:var(--tint);color:var(--ink)}
+#launch .amsg.bad{display:block;background:#2a0d0d;color:var(--bad);border:1px solid var(--bad)}
+#launch .warnbox{margin:14px 0 4px;padding:12px;border-radius:14px;background:var(--card);border:2px solid var(--line);border-left:5px solid var(--warn);font-size:14px;line-height:1.45}
+#launch .warnbox .ic{color:var(--warn)}
+#launch .card .f{color:var(--muted)}

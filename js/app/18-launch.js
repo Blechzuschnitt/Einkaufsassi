@@ -27,16 +27,47 @@ function showLaunch() {
 /* Erster Start: Funktionen auswählen (später im Menü änderbar) */
 function showOnboard(next) {
   var d = document.createElement("div"); d.id = "launch"; d.className = "onb"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Willkommen");
-  d.innerHTML = '<div class="lwrap"><img class="llogo sm" src="logo.webp" alt="EinkaufsAssi" width="150" height="150"><div class="ltitle">Willkommen beim EinkaufsAssi</div><div class="lq">Welche Funktionen möchtest du nutzen?<br><small>Du kannst das jederzeit im Menü unter „Funktionen“ ändern.</small></div>' +
+  d.innerHTML = '<div class="lwrap"><img class="llogo sm" src="logo.webp" alt="EinkaufsAssi" width="150" height="150"><div class="ltitle">Willkommen beim EinkaufsAssi</div><div class="lq">Schritt 1 von 2 · Welche Funktionen möchtest du nutzen?<br><small>Du kannst das jederzeit im Menü unter „Funktionen“ ändern.</small></div>' +
     '<div class="card" id="oFeat">' + FEATURES.map(function (f) {
       return '<label class="tog"><span><b>' + f[1] + "</b><small>" + f[2] + '</small></span><input type="checkbox" data-f="' + f[0] + '"' + (F(f[0]) ? " checked" : "") + "><i></i></label>"; }).join("") + "</div>" +
-    '<div class="col"><button class="btn primary" id="oGo" type="button" style="flex:none">Los geht’s</button></div></div>';
+    '<div class="col"><button class="btn primary" id="oGo" type="button" style="flex:none">Weiter</button></div></div>';
   document.body.appendChild(d);
   $("oGo").onclick = function () {
     state.features = {};
     Array.prototype.forEach.call(d.querySelectorAll("[data-f]"), function (x) { state.features[x.dataset.f] = x.checked; });
-    state.onboarded = true; S.save(); d.remove(); render(); next();
+    state.onboarded = true; S.save(); d.remove(); render(); showAccountStep(next);
   };
+}
+/* Erster Start, Schritt 2: Konto für die Cloud-Sicherung – oder bewusst ohne */
+function showAccountStep(next) {
+  if (cloud.user) { next(); return; }
+  var d = document.createElement("div"); d.id = "launch"; d.className = "onb"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Konto anlegen");
+  d.innerHTML = '<div class="lwrap"><img class="llogo sm" src="logo.webp" alt="EinkaufsAssi" width="150" height="150">' +
+    '<div class="ltitle">Konto anlegen</div><div class="lq">Schritt 2 von 2<br><small>Mit Konto werden deine Daten automatisch in der Cloud gesichert und sind auf jedem Handy wieder da.</small></div>' +
+    '<div class="card"><label class="f" style="margin-top:0">Benutzername</label><input type="text" id="aUser" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="z. B. sascha">' +
+    '<label class="f">Passwort</label><input type="password" id="aPass" autocomplete="new-password" placeholder="mindestens 6 Zeichen">' +
+    '<div id="aMsg" class="amsg"></div>' +
+    '<div class="col"><button class="btn primary" id="aReg" type="button" style="flex:none">Konto anlegen</button>' +
+    '<button class="btn" id="aIn" type="button">Ich habe schon ein Konto – anmelden</button></div>' +
+    '<div class="hint">Merk dir das Passwort gut – ohne E-Mail-Adresse lässt es sich nicht zurücksetzen.</div></div>' +
+    '<div class="warnbox">' + I("alert") + ' <b>Ohne Konto</b> werden deine Daten nur in diesem Browser gespeichert. Löschst du die Browserdaten oder wechselst das Handy, sind Listen, Preise und Vorrat weg.</div>' +
+    '<div class="col"><button class="btn" id="aSkip" type="button">Ohne Konto weiter</button></div>' +
+    '<div class="hint" style="text-align:center">Ein Konto kannst du auch später im Menü unter „Cloud-Sicherung“ anlegen.</div></div>';
+  document.body.appendChild(d);
+  var say = function (t, bad) { var m = $("aMsg"); m.textContent = t; m.className = "amsg " + (bad ? "bad" : "ok"); };
+  function go(register) {
+    var u = cloudName($("aUser").value), p = $("aPass").value;
+    if (!/^[a-z0-9._-]{3,30}$/.test(u)) { say("Benutzername: 3–30 Zeichen, nur Buchstaben a–z, Ziffern und . _ -", true); $("aUser").focus(); return; }
+    if (p.length < 6) { say("Das Passwort braucht mindestens 6 Zeichen.", true); $("aPass").focus(); return; }
+    say(register ? "Lege Konto an …" : "Melde an …");
+    cloudLogin(u, p, register).then(function () {
+      d.remove(); toast(register ? "Konto angelegt – deine Daten werden ab jetzt gesichert." : "Angemeldet – Daten aus der Cloud geholt.", 4000); next();
+    }, function (e) { say(e.message, true); });
+  }
+  $("aReg").onclick = function () { go(true); };
+  $("aIn").onclick = function () { go(false); };
+  $("aPass").onkeydown = function (e) { if (e.key === "Enter") { e.preventDefault(); go(true); } };
+  $("aSkip").onclick = function () { d.remove(); next(); };
 }
 /* beim Start aufrufen */
 function launchStart() {
