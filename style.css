@@ -636,3 +636,6 @@ input[type=text]:focus,textarea:focus,#q:focus,select:focus{border-color:var(--a
 #launch .warnbox{margin:14px 0 4px;padding:12px;border-radius:14px;background:var(--card);border:2px solid var(--line);border-left:5px solid var(--warn);font-size:14px;line-height:1.45}
 #launch .warnbox .ic{color:var(--warn)}
 #launch .card .f{color:var(--muted)}
+body.area-lager .logo b span{color:var(--gold)}
+body.area-lager .logo b{text-shadow:0 0 12px rgba(var(--gold-rgb),.35)}
+body.area-lager .logo img{box-shadow:0 0 0 2px var(--gold),0 0 14px rgba(var(--gold-rgb),.5)}

@@ -6,7 +6,15 @@ function go(t) { tab = t; if (t !== "pantry") lastShop = t; window.scrollTo(0, 0
 
 /* ---------- Untere Leiste: Bereich Einkaufen | Lager, je Bereich eigene Symbole ---------- */
 function area() { return tab === "pantry" ? "lager" : "einkauf"; }
+/* Titel oben je Bereich: EinkaufsAssi / LagerAssi */
+function renderTitle() {
+  var lager = area() === "lager", b = document.querySelector(".logo b");
+  if (b) b.innerHTML = (lager ? "Lager" : "Einkaufs") + "<span>Assi</span>";
+  document.body.classList.toggle("area-lager", lager);
+  document.title = lager ? "LagerAssi" : "EinkaufsAssi";
+}
 function renderTabs() {
+  renderTitle();
   var ar = area(), btn = function (attr, icon, label, on) { return '<button type="button" ' + attr + (on ? ' class="on"' : "") + ">" + ico(IC[icon]) + "<span>" + label + "</span></button>"; };
   var scanOn = function (m) { return live.on && scanMode === m; };
   var left, right;
