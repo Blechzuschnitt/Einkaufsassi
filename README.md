@@ -10,6 +10,11 @@ Eine kleine Web-App für dein Handy. Alles läuft im Browser, deine Daten bleibe
 - **Kassenbon-Vergleich:** Bon-Text einfügen, die App ordnet die Zeilen der Liste zu und zeigt teurer/günstiger, nicht geplant, vergessen. Neue Preise lassen sich übernehmen.
 - **Angebote:** Die Liste prüft Artikel mit Barcode automatisch in Open Prices (offene Preisdatenbank, in Deutschland gemeldete Angebote der letzten 3 Wochen). Eigene Angebote (Markt, Preis, gültig bis) trägst du im Artikel ein; sie zählen in Summe und Marktvergleich mit und verschwinden nach Ablauf. Dazu Such-Knöpfe für Marktguru und kaufDA.
 - **Vorrat:** was du zu Hause hast, mit Datum. Ein- und Austragen per Suche, +/− oder Scan (Scan-Modus „＋ Vorrat“ / „− Vorrat“). Nach dem Einkauf („Einkauf fertig“ oder Bon-Vergleich) landen die Artikel mit Datum im Vorrat. Willst du etwas auf die Liste setzen, das noch im Vorrat ist, fragt die App nach, ob es noch da ist.
+- **MHD:** im Vorrat je Artikel „＋ MHD“ (Schnellwahl oder Datum); auf dem Start erscheint eine Warnung, wenn etwas in ≤ 3 Tagen abläuft.
+- **Laufweg:** Die App merkt sich je Markt, in welcher Reihenfolge du abhakst, und sortiert die Liste beim nächsten Mal so.
+- **Spracheingabe:** 🎤 neben der Suche – z. B. „Milch, zwei Butter und Eier“ (Chrome/Android; die Spracherkennung läuft über den Dienst des Browsers).
+- **Bon per Foto:** Beim Kassenbon-Vergleich „📷 Bon fotografieren“ – Texterkennung (Tesseract.js, wird beim ersten Mal aus dem Netz geladen). Ergebnis bitte kurz prüfen.
+- **Preisverlauf** je Artikel und Markt als kleines Diagramm, **Monatsbudget** auf Start und Statistik, **Sicherungs-Erinnerung** nach 7 Tagen.
 - **Statistik:** Ausgaben pro Monat und Markt, häufigste Artikel, Preisänderungen, Listenpreis je Markt.
 - **Live-Scan:** Kamera-Zeile unten, Barcode davorhalten, Piepton, fertig. Bekannte Artikel landen sofort im Wagen.
 - **Neuer Artikel:** Name, Foto und (wenn möglich) Pfand holt sich die App online aus Open Food Facts. Du tippst nur den Preis ein.

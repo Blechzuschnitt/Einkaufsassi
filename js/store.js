@@ -52,7 +52,11 @@ var Store = (function () {
     if (!state.purchases) state.purchases = [];
     if (!state.lists) state.lists = [];
     if (!state.cards) state.cards = {};
-    if (!state.pantry) state.pantry = {};   // Vorrat: {key: [{q, d, src}]} – Einlagerungen mit Datum   // Kundenkarten: {Markt: {code, d}} – nur auf diesem Gerät
+    if (!state.pantry) state.pantry = {};
+    if (!state.route) state.route = {};
+    if (!state.outlog) state.outlog = [];       // Auslagerungen: {b, n, q, d, w (weggeworfen), v (Wert in Cent), loc}          // Laufweg je Markt: {Markt: {key: 0…1}}
+    if (!state.firstUse) state.firstUse = Date.now();
+    if (state.budget == null) state.budget = 0;  // Monatsbudget in Cent, 0 = keins   // Vorrat: {key: [{q, d, src}]} – Einlagerungen mit Datum   // Kundenkarten: {Markt: {code, d}} – nur auf diesem Gerät
     if (state.v !== 3) {
       var cart = state.cart || {};
       Object.keys(cart).forEach(function (st) {
@@ -179,13 +183,21 @@ var Store = (function () {
 
   /* ----- Vorrat (zu Hause) ----- */
   function pantryOf(b) {
-    var lots = state.pantry[b] || [], q = 0, since = 0;
-    lots.forEach(function (l) { q += l.q; if (!since || l.d < since) since = l.d; });
-    return { q: q, since: since, lots: lots };
+    var lots = state.pantry[b] || [], q = 0, since = 0, exp = "";
+    lots.forEach(function (l) { q += l.q; if (!since || l.d < since) since = l.d; if (l.exp && (!exp || l.exp < exp)) exp = l.exp; });
+    return { q: q, since: since, lots: lots, exp: exp };
   }
-  function pantryAdd(b, q, d, src) {
+  function pantryAdd(b, q, d, src, exp) {
     if (!products[b] || !(q > 0)) return;
-    (state.pantry[b] || (state.pantry[b] = [])).push({ q: q, d: d || Date.now(), src: src || "hand" });
+    var lot = { q: q, d: d || Date.now(), src: src || "hand" }; if (exp) lot.exp = exp;
+    (state.pantry[b] || (state.pantry[b] = [])).push(lot);
+  }
+  /* MHD für alle Einlagerungen eines Artikels setzen ("" = keins) */
+  function setExp(b, exp) { (state.pantry[b] || []).forEach(function (l) { if (exp) l.exp = exp; else delete l.exp; }); }
+  /* Laufweg lernen: rel = 0 (zuerst abgehakt) … 1 (zuletzt) */
+  function learnRoute(st, b, rel) {
+    var r = state.route[st] || (state.route[st] = {});
+    r[b] = r[b] == null ? rel : r[b] * 0.6 + rel * 0.4;
   }
   /* Älteste zuerst verbrauchen; gibt den Rest im Vorrat zurück */
   function pantryTake(b, q) {
@@ -276,6 +288,7 @@ var Store = (function () {
     (s.stores || []).forEach(function (st) { if (state.stores.indexOf(st) < 0) state.stores.push(st); });
     (s.lists || []).forEach(function (l) { if (!listById(l.id)) state.lists.push(l); });
     (s.purchases || []).forEach(function (pu) { if (!state.purchases.some(function (x) { return x.id === pu.id; })) state.purchases.push(pu); });
+    (s.outlog || []).forEach(function (o) { if (!state.outlog.some(function (x) { return x.d === o.d && x.b === o.b; })) state.outlog.push(o); });
     Object.keys(s.pantry || {}).forEach(function (b) { if (!state.pantry[b] && products[b]) state.pantry[b] = s.pantry[b]; });
     Object.keys(s.cards || {}).forEach(function (st) { if (!state.cards[st]) state.cards[st] = s.cards[st]; });
     (s.seeded || []).forEach(function (id) { if (state.seeded.indexOf(id) < 0) state.seeded.push(id); });
@@ -291,6 +304,7 @@ var Store = (function () {
     offersOf: offersOf, offerAt: offerAt, addOffer: addOffer, removeOffer: removeOffer, matchStore: matchStore, newKey: newKey, rekey: rekey, removeProduct: removeProduct, eachListItem: eachListItem,
     listById: listById, activeList: activeList, newList: newList, removeList: removeList, addToList: addToList,
     LOCS: LOCS, locOf: locOf, guessLoc: guessLoc,
+    setExp: setExp, learnRoute: learnRoute,
     pantryOf: pantryOf, pantryAdd: pantryAdd, pantryTake: pantryTake, pantryClear: pantryClear,
     totals: totals, storeCompare: storeCompare,
     applySeeds: applySeeds, exportJSON: exportJSON, importJSON: importJSON

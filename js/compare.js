@@ -62,8 +62,20 @@ var Compare = (function () {
       '<label class="f">Kassenbon – eine Zeile pro Artikel: <i>Name Preis</i></label>' +
       '<textarea id="cTxt" rows="9" placeholder="Laugenstange 1,99\nMineralwasser 0,58\n2 x 0,29\nPfand 0,50\nSumme 3,07"></textarea>' +
       '<div class="hint">Text vom Bon abtippen oder einfügen (z. B. aus der Lidl-Plus-/Rewe-App oder per Text-Erkennung der Handy-Kamera kopiert). Mengenzeilen „2 x 0,29“, Pfand, Rabatte und „Summe“ werden erkannt.</div>' +
-      '<div class="col"><button class="btn" id="cFill" type="button">Abgehakte Artikel als Bon übernehmen</button>' +
-      '<button class="btn primary" id="cGo" type="button" style="flex:none">Auswerten</button></div><div id="msg"></div><div id="cRes"></div>');
+      '<div class="col"><label class="btn ocr" for="cImg">📷 Bon fotografieren / Foto wählen</label>' +
+      '<button class="btn" id="cFill" type="button">Abgehakte Artikel als Bon übernehmen</button>' +
+      '<button class="btn primary" id="cGo" type="button" style="flex:none">Auswerten</button></div><div id="msg"></div><div id="cRes"></div>' +
+      '<input type="file" id="cImg" class="hide" accept="image/*">');
+    $("cImg").onchange = function () {
+      var f = this.files && this.files[0], inp = this; if (!f) return; inp.value = "";
+      ocr(f, function (p) { App.msg(p, "ok"); }).then(function (txt) {
+        var lines = cleanOcr(txt);
+        if (!lines.length) { App.msg("Kein Text mit Preisen erkannt. Bon gerade, flach und hell fotografieren – oder abtippen.", "bad"); return; }
+        $("cTxt").value = lines.join("\n") + "\n";
+        App.msg("✓ " + lines.length + " Zeilen erkannt – bitte kurz prüfen (Texterkennung ist nicht perfekt), dann „Auswerten“.", "ok");
+        $("cTxt").scrollIntoView({ behavior: "smooth", block: "center" });
+      }, function (e) { App.msg("Texterkennung fehlgeschlagen" + (navigator.onLine ? "" : " – beim ersten Mal braucht sie Internet") + ". (" + (e && e.message || e) + ")", "bad"); });
+    };
     $("cFill").onclick = function () {
       var its = l.items.filter(function (i) { return i.done; }); if (!its.length) its = l.items;
       $("cTxt").value = its.map(function (it) {
@@ -163,5 +175,46 @@ var Compare = (function () {
     U.toast("✓ Einkauf gespeichert" + (upd ? " · " + upd + " Preise aktualisiert" : "") + (created ? " · " + created + " neue Artikel" : "") + (nPan ? " · " + nPan + " in den Vorrat" : ""), 4000);
   }
 
-  return { open: open, parse: parse };
+  /* ---------- Texterkennung (Tesseract.js, wird nur bei Bedarf geladen) ---------- */
+  var tessP = null;
+  function loadTess() {
+    if (window.Tesseract) return Promise.resolve();
+    if (!tessP) tessP = new Promise(function (res, rej) {
+      var s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+      s.onload = res; s.onerror = function () { tessP = null; rej(new Error("Bibliothek nicht ladbar")); }; document.head.appendChild(s);
+    });
+    return tessP;
+  }
+  /* Foto → Graustufen, Kontrast hoch, sinnvolle Größe */
+  function prep(file) {
+    return new Promise(function (res, rej) {
+      var u = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        var sc = Math.min(1, 2000 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement("canvas");
+        c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc);
+        var x = c.getContext("2d"); x.drawImage(img, 0, 0, c.width, c.height);
+        var d = x.getImageData(0, 0, c.width, c.height), a = d.data;
+        for (var i = 0; i < a.length; i += 4) { var g = 0.299 * a[i] + 0.587 * a[i + 1] + 0.114 * a[i + 2]; g = Math.max(0, Math.min(255, (g - 128) * 1.6 + 140)); a[i] = a[i + 1] = a[i + 2] = g; }
+        x.putImageData(d, 0, 0); URL.revokeObjectURL(u); res(c);
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); rej(new Error("Bild nicht lesbar")); };
+      img.src = u;
+    });
+  }
+  function ocr(file, progress) {
+    progress("Texterkennung wird geladen … (beim ersten Mal einige MB)");
+    var worker;
+    return Promise.all([loadTess(), prep(file)]).then(function (r) {
+      return window.Tesseract.createWorker("deu", 1, { logger: function (m) { if (m.status === "recognizing text") progress("Lese den Bon … " + Math.round(m.progress * 100) + " %"); } })
+        .then(function (w) { worker = w; return w.recognize(r[1]); });
+    }).then(function (out) { if (worker) worker.terminate(); return out.data.text || ""; }, function (e) { if (worker) worker.terminate(); throw e; });
+  }
+  /* typische Lesefehler glätten, nur Zeilen mit Preis behalten */
+  function cleanOcr(txt) {
+    return String(txt).split(/\r?\n/).map(function (l) {
+      return l.replace(/\s+/g, " ").replace(/(\d)\s*[,.]\s*(\d\d)\b/g, "$1,$2").replace(/[|]/g, "").trim();
+    }).filter(function (l) { return /\d+,\d\d/.test(l) || /^\d+\s*[x×*]/i.test(l); });
+  }
+
+  return { open: open, parse: parse, cleanOcr: cleanOcr };
 })();

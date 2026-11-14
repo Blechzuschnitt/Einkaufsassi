@@ -1,4 +1,4 @@
-:root{--bg:#000;--card:#111;--card2:#1c1c1c;--ink:#fff;--muted:#c4c4c4;--line:#3a3a3a;--accent:#39ff14;--accent-ink:#000;--ok:#3dff9a;--bad:#ff5c5c;--good:#39ff14;
+:root{--bg:#000;--card:#111;--card2:#1c1c1c;--ink:#fff;--muted:#c4c4c4;--line:#3a3a3a;--accent:#ffe600;--accent-ink:#000;--ok:#4ade80;--bad:#ff5c5c;--good:#4ade80;
   --offer:#ffd60a;--pantry:#ff4fd8;--dry:#ffb020;--cool:#00e5ff;--frz:#8fb8ff;--info:#00e5ff;--items:#ff9f1c;--bon:#c77dff;--warn:#ff9f1c;--pc:var(--accent)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -29,7 +29,7 @@ select:focus{outline:none;border-color:var(--accent)}
 #sugg{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--card2);border:2px solid var(--accent);border-radius:14px;overflow:hidden;max-height:60vh;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.8)}
 #sugg.open{display:block}
 .sg{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:10px 12px;min-height:54px}
-.sg.first{background:#0f2a0a}
+.sg.first{background:#2a2600}
 .sg .sn{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sg .sp{font-variant-numeric:tabular-nums;font-weight:700}
 .sg .plus{color:var(--accent);font-weight:700;font-size:20px}
@@ -45,9 +45,9 @@ main{padding:8px 14px}
 .kv.s{font-size:15px;padding:5px 0;border-top:1px solid var(--line)}
 .kv.s:first-child{border-top:0}
 .card.total .kv b{font-size:26px;font-variant-numeric:tabular-nums}
-.note{background:#0f2a0a;border:2px solid #1f6b10;border-radius:14px;padding:10px 12px;font-size:14px;margin:10px 0;line-height:1.5}
+.note{background:#2a2600;border:2px solid #6b6000;border-radius:14px;padding:10px 12px;font-size:14px;margin:10px 0;line-height:1.5}
 
-.hero{background:linear-gradient(160deg,#0f2a0a,#000 70%);border:2px solid var(--accent);border-radius:18px;padding:16px;margin:6px 0 10px;cursor:pointer}
+.hero{background:linear-gradient(160deg,#2a2600,#000 70%);border:2px solid var(--accent);border-radius:18px;padding:16px;margin:6px 0 10px;cursor:pointer}
 .hero .k{font-size:13px;color:var(--muted)}
 .hero .big{font-size:44px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;margin:4px 0 0;line-height:1.1}
 .quick{display:flex;gap:8px}
@@ -71,7 +71,7 @@ main{padding:8px 14px}
 .sep{font-size:13px;color:var(--accent);margin:16px 2px 4px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 
 .row{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px;margin:7px 0;min-height:64px}
-.row.in{border-color:#1f6b10;opacity:.75}
+.row.in{border-color:#6b6000;opacity:.75}
 .row.in .name{text-decoration:line-through}
 .tick{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--muted);background:transparent;display:grid;place-items:center;font-size:18px;font-weight:800;color:var(--accent-ink);padding:0}
 .row.in .tick{background:var(--accent);border-color:var(--accent)}
@@ -120,7 +120,7 @@ label.check input{width:22px;height:22px;accent-color:var(--accent);flex:none}
 .tabs button i{font-style:normal;font-size:21px;line-height:1.1}
 .tabs button.on{color:var(--accent)}
 .tabs .scan{margin-top:-18px}
-.tabs .scan i{background:var(--accent);color:var(--accent-ink);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:900;letter-spacing:-2px;box-shadow:0 0 0 4px var(--bg),0 0 18px rgba(57,255,20,.45)}
+.tabs .scan i{background:var(--accent);color:var(--accent-ink);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:900;letter-spacing:-2px;box-shadow:0 0 0 4px var(--bg),0 0 18px rgba(255,230,0,.45)}
 .tabs .scan span{color:var(--accent);font-weight:700}
 .tabs .scan.on i{background:var(--bad)}
 
@@ -174,7 +174,7 @@ body.scanning #toast{bottom:calc(300px + env(safe-area-inset-bottom))}
 /* Angebote */
 .tag{display:inline-block;color:var(--accent-ink);background:var(--accent);border-radius:6px;padding:0 6px;font-size:12px;font-weight:700;margin-top:3px}
 .row.deal{border-color:var(--accent)}
-.row.in.deal{border-color:#1f6b10}
+.row.in.deal{border-color:#6b6000}
 .note.deal{cursor:pointer;border-color:var(--accent)}
 .offbar{margin:10px 0}
 .offbar .btn{width:100%;min-height:46px;font-size:15px}
@@ -256,7 +256,7 @@ body.scanning #toast{bottom:calc(300px + env(safe-area-inset-bottom))}
 .p-pantry .row{border-left:5px solid var(--pantry)}
 .p-pantry .row.old{border-left-color:var(--warn)}
 .tolist{width:40px;height:34px;border-radius:10px;border:2px solid var(--line);background:transparent;font-size:17px;padding:0}
-.tolist.on{border-color:var(--accent);background:#0f2a0a}
+.tolist.on{border-color:var(--accent);background:#2a2600}
 small.pan,.hint.pan{color:var(--pantry)}
 .btn.finish{border-color:var(--pantry);color:var(--pantry)}
 .smode{display:flex;gap:6px;margin-bottom:8px}
@@ -303,3 +303,153 @@ small.pan,.hint.pan{color:var(--pantry)}
 .qty.big button{width:52px;height:48px;font-size:24px}
 .qty.big span{min-width:44px;font-size:22px}
 .datein{width:100%;padding:13px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;font-size:18px;color-scheme:dark}
+
+/* ---- MHD ---- */
+.mhd{display:inline-block;margin-top:4px;border-radius:8px;padding:2px 8px;font-size:13px;font-weight:800;border:2px solid var(--line);background:transparent;color:var(--ink)}
+.mhd.none{color:var(--muted);font-weight:600;border-style:dashed}
+.mhd.ok{border-color:#6b6000;color:var(--good)}
+.mhd.warn{background:var(--warn);border-color:var(--warn);color:#000}
+.mhd.bad{background:var(--bad);border-color:var(--bad);color:#000}
+.note.exp{background:#2a1500;border-color:var(--warn);cursor:pointer}
+.note.exp .warn{color:var(--warn);font-weight:700}.note.exp .bad{color:var(--bad);font-weight:700}.note.exp .ok{color:var(--good)}
+/* ---- Sicherung ---- */
+.note.bk{background:#1a1030;border-color:var(--bon)}
+.note.bk .btn{min-height:44px;font-size:15px}
+/* ---- Budget ---- */
+.card.budget{cursor:pointer;border-color:var(--good)}
+.card.budget .kv b{font-size:20px;color:var(--good)}
+.card.budget.warn{border-color:var(--warn)}.card.budget.warn .kv b{color:var(--warn)}
+.card.budget.bad{border-color:var(--bad)}.card.budget.bad .kv b{color:var(--bad)}
+.bbar{height:12px;background:var(--card2);border-radius:6px;overflow:hidden;margin:8px 0 2px}
+.bbar i{display:block;height:100%;background:var(--good)}
+.card.budget.warn .bbar i{background:var(--warn)}.card.budget.bad .bbar i{background:var(--bad)}
+.lrow.add.bud{color:var(--info)}
+/* ---- Mikrofon ---- */
+.mic{font-size:20px}
+.mic.on{background:var(--bad);border-color:var(--bad);animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(255,92,92,.35)}}
+/* ---- Bon-Foto ---- */
+.btn.ocr{border-color:var(--bon);color:var(--bon)}
+/* ---- Preisverlauf ---- */
+.pchart{width:100%;height:auto;display:block}
+.pchart text{fill:var(--muted);font-size:10px;font-family:system-ui,sans-serif}
+.pchart .gl{stroke:var(--line);stroke-width:1;stroke-dasharray:3 3}
+
+/* =================================================================
+   Ruhiges Schema: Schwarz/Weiß/Grau, EINE Akzentfarbe (Neongrün)
+   für Hauptaktionen und Summen. Andere Farben nur als kleines Signal
+   (Angebot gelb, Warnung orange, Fehler rot) – keine Flächen.
+   ================================================================= */
+:root{--line:#333;--muted:#b8b8b8}
+.p-home,.p-list,.p-items,.p-stats,.p-pantry,#edit{--pc:var(--muted)}
+h3{color:var(--muted)}
+.logo{color:var(--ink)}
+.tabs button.on,.tabs [data-tab].on{color:var(--accent)}
+.tabs .scan i{box-shadow:0 0 0 4px var(--bg)}
+
+/* Karten & Hinweise: dunkelgrau, Farbe nur als schmaler Streifen links */
+.hero{background:var(--card);border-color:var(--line)}
+.note,.note.deal,.note.exp,.note.bk{background:var(--card);border:2px solid var(--line);border-left-width:5px}
+.note{border-left-color:var(--muted)}
+.note.deal{border-left-color:var(--offer)}
+.note.exp{border-left-color:var(--warn)}
+.note.bk{border-left-color:var(--muted)}
+.tile,.tile.c-items,.tile.c-list,.tile.c-home,.tile.c-stats,.tile.c-pantry,.p-stats .tile{border:2px solid var(--line)}
+.tile b,.tile.c-items b,.tile.c-list b,.tile.c-home b,.tile.c-stats b,.tile.c-pantry b{color:var(--ink)}
+.card.budget,.card.budget.warn,.card.budget.bad{border-color:var(--line)}
+.card.budget .kv b{color:var(--ink)}
+.card.budget.warn .kv b{color:var(--warn)}.card.budget.bad .kv b{color:var(--bad)}
+
+/* Zeilen: einheitlich grau umrandet */
+.row.deal,.row.in.deal{border-color:var(--line)}
+.p-pantry .row,.p-pantry .row.l-trocken,.p-pantry .row.l-kuehl,.p-pantry .row.l-tk{border-left:2px solid var(--line)}
+.p-pantry .row.old{border-color:var(--line);border-left:5px solid var(--warn)}
+.row.in{border-color:var(--line)}
+
+/* Knöpfe: neutral, nur Hauptaktion grün */
+.btn.pinb,.btn.loosebtn,.btn.finish,.btn.ocr,.offbar .btn{border-color:var(--line);color:var(--ink)}
+.p-items .addb{border-color:var(--line);color:var(--ink)}.p-items .addb.on{background:var(--ink);color:#000;border-color:var(--ink)}
+.addb{border-color:var(--line);color:var(--ink)}.addb.on{background:var(--ink);color:#000}
+.smode button[data-m=in].on,.smode button[data-m=out].on{background:var(--accent);border-color:var(--accent)}
+#strip[data-mode=in],#strip[data-mode=out]{border-color:var(--accent)}
+.cardbtn.has{color:var(--ink);border-color:var(--line);box-shadow:none}
+.chip.on{border-color:var(--ink);color:var(--ink)}
+.lrow.add,.lrow.add.bud{color:var(--muted)}
+.lrow.on{border-color:var(--muted)}
+
+/* Vorrat-Fächer: nur das Symbol unterscheidet, Auswahl weiß */
+.lc.on,.lc.l-trocken.on,.lc.l-kuehl.on,.lc.l-tk.on{background:var(--ink);border-color:var(--ink);color:#000}
+.lochead,.lochead.l-trocken,.lochead.l-kuehl,.lochead.l-tk{color:var(--ink);border-color:var(--line)}
+.chip.loc.l-trocken.on,.chip.loc.l-kuehl.on,.chip.loc.l-tk.on{background:var(--ink);border-color:var(--ink)}
+small.pan,.hint.pan{color:var(--muted)}
+
+/* Statistik-Balken: eine Farbe */
+.bar .bt i,.p-stats .bar .bt i{background:var(--accent)!important}
+
+/* Signale bleiben, aber klein */
+.tag{background:var(--offer);color:#000}
+.mhd.ok{border-color:var(--line);color:var(--ink)}
+.cmp.extra{border-color:var(--line);border-left:5px solid var(--warn)}
+.sep{color:var(--muted)}
+#sumbar .sv{color:var(--accent)}
+
+/* ---- Gelb als Akzent, Angebote neutral weiß ---- */
+:root{--offer:#ffffff}
+.tag{background:#fff;color:#000}
+/* ---- Untere Leiste: klare Linien-Symbole ---- */
+.tabs button{padding:8px 0 9px;gap:3px;font-size:11px;font-weight:600;color:#9a9a9a}
+.tabs .ti{width:24px;height:24px;display:block}
+.tabs button.on,.tabs [data-tab].on{color:var(--accent)}
+.tabs button.on span{font-weight:800}
+.tabs .scan{margin-top:-20px}
+.tabs .scan i{width:56px;height:56px;border-radius:50%;background:var(--accent);color:#000;display:grid;place-items:center;box-shadow:0 0 0 4px var(--bg)}
+.tabs .scan i .ti{width:28px;height:28px;stroke-width:2.4}
+.tabs .scan span{color:var(--accent);font-weight:700}
+.tabs .scan.on i{background:var(--bad)}
+
+/* ---- Untere Leiste mit Bereichs-Umschalter ---- */
+.tabs{grid-template-columns:1fr 1fr 2.3fr 1fr 1fr;align-items:center}
+.tabs > button{background:none;border:0;color:#9a9a9a;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 10px;font-size:11px;font-weight:600;margin:0}
+.tabs > button.on{color:var(--accent)}
+.tabs > button.on span{font-weight:800}
+.tabs .area{display:flex;background:var(--card2);border:2px solid var(--line);border-radius:14px;padding:3px;gap:3px;margin:6px 4px}
+.tabs .area button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;background:none;border:0;border-radius:10px;color:#9a9a9a;padding:5px 0 4px;font-size:11px;font-weight:700}
+.tabs .area .ti{width:20px;height:20px}
+.tabs .area button.on{background:var(--accent);color:#000}
+
+/* ---- Ein Umschalt-Knopf in der Mitte ---- */
+.tabs{grid-template-columns:1fr 1fr 1.5fr 1fr 1fr}
+.tabs > button.area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;margin:-18px 6px 6px;padding:8px 0 6px;
+  background:var(--accent);color:#000;border:4px solid var(--bg);border-radius:20px;font-size:12px;font-weight:800}
+.tabs > button.area .ti{width:26px;height:26px}
+.tabs > button.area .aswap{position:absolute;top:4px;right:8px;font-size:13px;font-weight:900;opacity:.75}
+.tabs > button.area.lager{background:#fff}
+/* ---- Umschalt-Knopf rund ---- */
+.tabs > button.area,.tabs > button.area.lager{background:none;border:0;border-radius:0;margin:-24px 0 0;padding:0 0 9px;color:var(--accent);gap:3px}
+.tabs > button.area .aico{position:relative;width:60px;height:60px;border-radius:50%;background:var(--accent);color:#000;display:grid;place-items:center;box-shadow:0 0 0 4px var(--bg)}
+.tabs > button.area.lager .aico{background:#fff}
+.tabs > button.area.lager{color:#fff}
+.tabs > button.area .aswap{top:auto;right:auto;position:absolute;margin:0;bottom:24px;left:calc(50% + 14px);width:20px;height:20px;border-radius:50%;background:#000;color:#fff;font-size:12px;line-height:20px;opacity:1;border:2px solid var(--bg)}
+.tabs > button.area .alab{font-size:11px;font-weight:800}
+.tabs > button.area,.tabs > button.area.lager{margin-top:-6px;padding-top:4px}
+.tabs > button.area .aico{width:54px;height:54px;box-shadow:none}
+.tabs > button.area .aswap{bottom:22px;left:calc(50% + 12px)}
+
+/* ---- Wegwerfen ---- */
+.rbtns{display:flex;gap:4px}
+.waste{width:36px;height:34px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--muted);padding:0;display:grid;place-items:center}
+.waste .ti{width:18px;height:18px}
+.waste:active{border-color:var(--bad);color:var(--bad)}
+.wastecard{display:block;width:100%;text-align:left;color:var(--ink);margin-top:16px;cursor:pointer}
+.wastecard .kv b{color:var(--ink)}
+.smode{flex-wrap:wrap}
+.smode button{min-width:22%}
+.smode button[data-m=waste].on{background:var(--bad);border-color:var(--bad);color:#000}
+
+/* ---- Füllstand ---- */
+.fill{display:flex;align-items:center;gap:8px;margin-top:6px;background:none;border:0;padding:2px 0;color:var(--ink);width:100%;max-width:220px}
+.fbar{flex:1;height:12px;border:2px solid var(--muted);border-radius:7px;overflow:hidden;background:var(--card2)}
+.fbar i{display:block;height:100%;background:var(--ink)}
+.fill b{font-size:13px;min-width:36px;text-align:left}
+.fill.low .fbar{border-color:var(--warn)}.fill.low .fbar i{background:var(--warn)}.fill.low b{color:var(--warn)}
+#ask .col .btn{min-height:48px}
