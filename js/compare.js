@@ -129,6 +129,7 @@ var Compare = (function () {
       '<label class="check"><input type="checkbox" id="oPrice" checked> Bon-Preise als neue Preise bei ' + esc(st) + " übernehmen</label>" +
       '<label class="check"><input type="checkbox" id="oNew"' + (extra.length ? "" : " disabled") + "> Nicht geplante Artikel als neue Artikel anlegen</label>" +
       '<label class="check"><input type="checkbox" id="oDone" checked> Gekaufte Artikel von der Liste nehmen</label>' +
+      '<label class="check"><input type="checkbox" id="oPan" checked> Gekaufte Artikel mit heutigem Datum in den Vorrat</label>' +
       '<div class="col"><button class="btn primary" id="cSave" type="button" style="flex:none">Einkauf speichern</button></div>';
     $("cRes").innerHTML = h;
     Array.prototype.forEach.call(document.querySelectorAll("#cRes select[data-i]"), function (s) {
@@ -144,7 +145,7 @@ var Compare = (function () {
 
   function save() {
     var l = cur.list, st = cur.store, S = Store, upd = 0, created = 0;
-    var takePrice = $("oPrice").checked, makeNew = $("oNew").checked, rmDone = $("oDone").checked;
+    var takePrice = $("oPrice").checked, makeNew = $("oNew").checked, rmDone = $("oDone").checked, toPan = $("oPan").checked, now = Date.now(), nPan = 0;
     var items = cur.lines.map(function (ln) {
       var b = ln.assign || ln.known || null;
       if (!b && makeNew) { b = S.newKey(ln.name); S.products[b] = { b: b, name: ln.name, prices: {}, created: Date.now() }; created++; }
@@ -152,13 +153,14 @@ var Compare = (function () {
         var unit = Math.round(ln.price / ln.qty), before = S.priceOf(b, st);
         if (before !== unit && !S.offerAt(b, st)) { S.setPrice(b, st, unit); upd++; }   // Angebotspreis ist kein neuer Normalpreis
       }
+      if (b && toPan && S.products[b]) { S.pantryAdd(b, ln.qty || 1, now, "kauf"); nPan++; }
       return { name: ln.name, b: b, price: ln.price, qty: ln.qty };
     });
     S.state.purchases.push({ id: S.uid(), date: Date.now(), store: st, list: l.name, total: cur.sum.bon, expected: cur.sum.expected,
       items: items, extra: cur.sum.extra, missing: cur.sum.missing });
     if (rmDone) { var bought = {}; cur.lines.forEach(function (ln) { if (ln.assign) bought[ln.assign] = 1; }); l.items = l.items.filter(function (it) { return !bought[it.b]; }); }
     S.save(); App.closeEdit(); App.go("stats");
-    U.toast("✓ Einkauf gespeichert" + (upd ? " · " + upd + " Preise aktualisiert" : "") + (created ? " · " + created + " neue Artikel" : ""), 4000);
+    U.toast("✓ Einkauf gespeichert" + (upd ? " · " + upd + " Preise aktualisiert" : "") + (created ? " · " + created + " neue Artikel" : "") + (nPan ? " · " + nPan + " in den Vorrat" : ""), 4000);
   }
 
   return { open: open, parse: parse };

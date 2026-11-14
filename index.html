@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 <div id="err"></div>
@@ -33,6 +33,11 @@
 
 <div class="dock">
   <div id="scanPanel">
+    <div class="smode" id="smode">
+      <button type="button" data-m="list">🛒 → Liste</button>
+      <button type="button" data-m="in">🥫 ＋ Vorrat</button>
+      <button type="button" data-m="out">🥫 − Vorrat</button>
+    </div>
     <div id="strip"><video id="vid" playsinline muted></video><div class="line"></div><div class="hint2">Barcode vor die Linie halten</div><button id="torch" type="button" aria-label="Taschenlampe">🔦</button></div>
     <div class="sbar">
       <label class="btn" for="pick">📸 Foto</label>
@@ -45,23 +50,25 @@
     <button type="button" data-tab="home"><i>🏠</i><span>Start</span></button>
     <button type="button" data-tab="list"><i>📝</i><span>Liste</span></button>
     <button type="button" class="scan" id="scanBtn"><i>▮▯▮</i><span>Scannen</span></button>
+    <button type="button" data-tab="pantry"><i>🥫</i><span>Vorrat</span></button>
     <button type="button" data-tab="items"><i>📦</i><span>Artikel</span></button>
     <button type="button" data-tab="stats"><i>📊</i><span>Statistik</span></button>
   </nav>
 </div>
 <input type="file" id="pick" class="hide" accept="image/*">
+<div id="ask" role="dialog" aria-modal="true"></div>
 <div id="cardView" role="dialog" aria-label="Kundenkarte"></div>
 
 <div id="storePop" role="dialog" aria-label="Markt wählen"></div>
 <div id="edit"></div>
 <div id="toast"></div>
 
-<script src="js/data.js?v=8"></script>
-<script src="js/ui.js?v=8"></script>
-<script src="js/store.js?v=8"></script>
-<script src="js/lookup.js?v=8"></script>
-<script src="js/scanner.js?v=8"></script>
-<script src="js/compare.js?v=8"></script>
-<script src="js/app.js?v=8"></script>
+<script src="js/data.js?v=11"></script>
+<script src="js/ui.js?v=11"></script>
+<script src="js/store.js?v=11"></script>
+<script src="js/lookup.js?v=11"></script>
+<script src="js/scanner.js?v=11"></script>
+<script src="js/compare.js?v=11"></script>
+<script src="js/app.js?v=11"></script>
 </body>
 </html>

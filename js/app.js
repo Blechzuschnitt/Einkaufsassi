@@ -112,7 +112,7 @@
     suggList.forEach(function (x, i) {
       var pr = S.effPrice(x.b), have = inList(x.b);
       h += '<button type="button" class="sg' + (i === 0 ? " first" : "") + '" data-b="' + esc(x.b) + '">' + thumb(x.p, "sthumb") +
-        '<span class="sn">' + esc(x.p.name) + (have ? '<small> · ' + have + "× auf der Liste</small>" : "") + "</span>" +
+        '<span class="sn">' + esc(x.p.name) + (have ? '<small> · ' + have + "× auf der Liste</small>" : "") + (S.pantryOf(x.b).q ? '<small class="pan"> · 🥫 ' + S.pantryOf(x.b).q + "× im Haus</small>" : "") + "</span>" +
         '<span class="sp' + (pr == null ? " warn" : "") + '">' + (pr == null ? "kein Preis" : money(pr)) + '</span><span class="plus">＋</span></button>';
     });
     if (/^\d{8,14}$/.test(v) && !S.products[v]) h += '<button type="button" class="sg new" data-code="' + esc(v) + '">▮▯▮ Barcode ' + esc(v) + " anlegen</button>";
@@ -124,13 +124,72 @@
     var v = q.value.trim();
     q.value = ""; sugg.classList.remove("open"); q.blur();
     if (el.dataset.code) { handleCode(el.dataset.code); return; }
-    if (el.dataset.new) { openEdit(null, { name: v, add: true }); return; }
-    addB(el.dataset.b);
+    if (el.dataset.new) { openEdit(null, { name: v, add: true, target: tab === "pantry" ? "pantry" : "list" }); return; }
+    if (tab === "pantry") pantryIn(el.dataset.b); else addB(el.dataset.b);
   }
   function addB(b) {
-    var it = S.addToList(b, 1); S.save(); render();
-    var pr = S.priceOf(b);
-    toast("✓ " + S.products[b].name + (pr != null ? " · " + money(pr) : " · Preis fehlt") + " → " + S.activeList().name + (it.qty > 1 ? " (" + it.qty + "×)" : ""));
+    askPantry(b, function () {
+      var it = S.addToList(b, 1); S.save(); render();
+      var pr = S.effPrice(b);
+      toast("✓ " + S.products[b].name + (pr != null ? " · " + money(pr) : " · Preis fehlt") + " → " + S.activeList().name + (it.qty > 1 ? " (" + it.qty + "×)" : ""));
+    });
+  }
+
+  /* ---------- Vorrat ---------- */
+  function ago(ts) {
+    var d = Math.floor((Date.now() - ts) / 864e5);
+    return d <= 0 ? "heute" : d === 1 ? "gestern" : "vor " + d + " Tagen";
+  }
+  function pantryIn(b) {
+    S.pantryAdd(b, 1, Date.now(), "hand"); S.save(); render();
+    toast("🥫 " + S.products[b].name + " → Vorrat (" + S.pantryOf(b).q + "× im Haus)");
+  }
+  function pantryOut(b) {
+    var p = S.products[b];
+    if (!S.pantryOf(b).q) { toast(p.name + " ist nicht im Vorrat eingetragen"); return; }
+    var rest = S.pantryTake(b, 1); S.save(); render();
+    if (rest) { toast("🥫 " + p.name + " entnommen · noch " + rest + "× im Haus"); return; }
+    if (inList(b)) { toast("🥫 " + p.name + " aufgebraucht – steht schon auf der Liste"); return; }
+    ask("🥫 <b>" + esc(p.name) + "</b> ist jetzt aufgebraucht.", "Auf die Einkaufsliste setzen?",
+      [{ t: "🛒 Ja, auf die Liste", primary: true, fn: function () { S.addToList(b, 1); S.save(); render(); toast("✓ " + p.name + " → " + S.activeList().name); } },
+       { t: "Nein", fn: function () {} }]);
+  }
+  /* Steht der Artikel noch im Vorrat? Dann erst nachfragen. */
+  function askPantry(b, proceed) {
+    var v = S.pantryOf(b), p = S.products[b];
+    if (!v.q || inList(b)) { proceed(); return; }
+    ask("🥫 <b>" + esc(p.name) + "</b> ist laut Vorrat noch im Haus:<br><b>" + v.q + "×</b> seit " + U.day(v.since) + " (" + ago(v.since) + ").", "Ist noch etwas davon da?",
+      [{ t: "Ja, noch da – nicht kaufen", fn: function () { toast(p.name + " bleibt im Vorrat, nicht auf der Liste"); } },
+       { t: "🛒 Nein, aufgebraucht → auf die Liste", primary: true, fn: function () { S.pantryClear(b); proceed(); } },
+       { t: "Trotzdem auf die Liste", fn: proceed }]);
+  }
+  function ask(html, question, buttons) {
+    var a = $("ask"), wasLive = live.on && !live.paused;
+    if (wasLive) pauseLive();
+    a.innerHTML = '<div class="asksheet"><div class="asktxt">' + html + '</div><div class="askq">' + esc(question) + '</div><div class="col">' +
+      buttons.map(function (x, i) { return '<button type="button" class="btn' + (x.primary ? " primary" : "") + '" data-i="' + i + '">' + esc(x.t) + "</button>"; }).join("") + "</div></div>";
+    a.classList.add("open");
+    a.onclick = function (e) {
+      var bt = e.target.closest("[data-i]"); if (!bt && e.target !== a) return;
+      a.classList.remove("open"); a.innerHTML = ""; a.onclick = null;
+      if (wasLive) resumeLive();
+      if (bt) buttons[+bt.dataset.i].fn();
+    };
+  }
+  /* Abgehakte Artikel: Einkauf fertig → mit Datum in den Vorrat, als Einkauf speichern */
+  function finishShopping() {
+    var l = S.activeList(), st = state.store, now = Date.now(), items = [], total = 0;
+    l.items.filter(function (i) { return i.done; }).forEach(function (it) {
+      var p = S.products[it.b]; if (!p) return;
+      var pr = S.effPrice(it.b, st), line = (pr || 0) * it.qty + (p.deposit || 0) * it.qty;
+      total += line; items.push({ name: p.name, b: it.b, price: line, qty: it.qty });
+      S.pantryAdd(it.b, it.qty, now, "kauf");
+    });
+    if (!items.length) return;
+    state.purchases.push({ id: S.uid(), date: now, store: st, list: l.name, total: total, expected: total, items: items, extra: 0, missing: l.items.length - items.length, noBon: true });
+    l.items = l.items.filter(function (i) { return !i.done; });
+    S.save(); go("pantry");
+    toast("✓ Einkauf gespeichert · " + items.length + " Artikel mit Datum im Vorrat", 4000);
   }
   q.addEventListener("input", suggest);
   q.addEventListener("focus", suggest);
@@ -154,6 +213,8 @@
     else if (tab === "list") v.innerHTML = viewList();
     else if (tab === "items") { v.innerHTML = viewItemsShell(); renderItemRows(); }
     else if (tab === "stats") v.innerHTML = viewStats();
+    else if (tab === "pantry") v.innerHTML = viewPantry();
+    q.placeholder = tab === "pantry" ? "🔍 Artikel suchen → in den Vorrat" : "🔍 Artikel suchen → auf die Liste";
     renderSumbar();
   }
   function renderSumbar() {
@@ -190,7 +251,7 @@
       U.badge(ch[1].store, "sm") + " wäre " + money(ch[1].sum - ch[0].sum) + " teurer.</div>";
     h += '<div class="tiles">' +
       tile(nArt, "Artikel erfasst", "items", "c-items") + tile(state.lists.length, "Einkaufslisten", "list", "c-list") +
-      tile(money(month), "Ausgaben diesen Monat", "stats", "c-home") + tile(P.length, "Einkäufe gespeichert", "stats", "c-stats") + "</div>";
+      tile(Object.keys(state.pantry).length, "im Vorrat · " + S.LOCS.map(function (l) { return l.i + " " + Object.keys(state.pantry).filter(function (b) { return S.products[b] && S.locOf(b) === l.k; }).length; }).join(" "), "pantry", "c-pantry") + tile(money(month), "Ausgaben diesen Monat", "stats", "c-home") + "</div>";
     h += '<h3>Einkaufslisten</h3>';
     state.lists.forEach(function (x) {
       var tt = S.totals(x, x.store || state.store);
@@ -231,6 +292,7 @@
       '<div class="kv s"><span>Noch offen</span><span>' + money(t.total - t.doneSum) + "</span></div>" +
       (t.saved ? '<div class="kv s"><span>🏷 Angebote eingerechnet (' + t.offers + ")</span><span class=\"acc\">−" + money(t.saved) + "</span></div>" : "") +
       (t.miss ? '<div class="kv s warn"><span>' + t.miss + " ohne Preis</span><span>nicht eingerechnet</span></div>" : "") + "</div>";
+    if (t.doneN) h += '<div class="col"><button class="btn finish" data-act="finish" type="button" style="flex:none">✓ Einkauf fertig – ' + t.doneN + " abgehakte Artikel in den Vorrat</button></div>";
     h += '<div class="offbar"><button class="btn" data-act="offers" type="button"' + (opBusy ? " disabled" : "") + ">🏷 Angebote prüfen</button>" +
       (opInfo ? '<div class="hint">' + esc(opInfo) + "</div>" : '<div class="hint">Sucht in Open Prices nach in Deutschland gemeldeten Angeboten (letzte 3 Wochen, nur Artikel mit Barcode). Eigene Angebote trägst du im Artikel ein.</div>') + "</div>";
     setTimeout(function () { checkOffers(false); }, 300);
@@ -240,6 +302,45 @@
     return h;
   }
   function itemOf(b) { return S.activeList().items.filter(function (x) { return x.b === b; })[0]; }
+
+  /* ---------- Vorrat-Seite (Trocken / Kühlschrank / Gefrierschrank) ---------- */
+  var pLoc = "all";
+  function locInfo(k) { return S.LOCS.filter(function (l) { return l.k === k; })[0] || S.LOCS[0]; }
+  function viewPantry() {
+    var keys = Object.keys(state.pantry).filter(function (b) { return S.products[b] && S.pantryOf(b).q > 0; });
+    var cnt = { all: keys.length }; S.LOCS.forEach(function (l) { cnt[l.k] = 0; });
+    keys.forEach(function (b) { cnt[S.locOf(b)]++; });
+    var h = '<div class="quick"><button class="btn pinb" data-act="scanin" type="button">＋ Einlagern (Scan)</button><button class="btn" data-act="scanout" type="button">− Entnehmen (Scan)</button></div>' +
+      '<div class="locchips"><button type="button" class="lc' + (pLoc === "all" ? " on" : "") + '" data-act="ploc" data-l="all"><span>Alle</span><b>' + cnt.all + "</b></button>" +
+      S.LOCS.map(function (l) { return '<button type="button" class="lc l-' + l.k + (pLoc === l.k ? " on" : "") + '" data-act="ploc" data-l="' + l.k + '">' + "<span>" + l.i + " " + l.t.replace("schrank", "") + "</span><b>" + cnt[l.k] + "</b></button>"; }).join("") + "</div>";
+    if (!keys.length) return h + '<div class="empty">Noch nichts im Vorrat.<br>Oben einen Artikel suchen, <b>＋ Einlagern</b> scannen<br>oder nach dem Einkauf „Einkauf fertig“ tippen.</div>';
+    keys.sort(function (a, b) { return S.pantryOf(a).since - S.pantryOf(b).since; });
+    S.LOCS.forEach(function (l) {
+      if (pLoc !== "all" && pLoc !== l.k) return;
+      var ks = keys.filter(function (b) { return S.locOf(b) === l.k; });
+      if (!ks.length) { if (pLoc === l.k) h += '<div class="empty">Nichts im Fach ' + l.t + ".</div>"; return; }
+      var pcs = ks.reduce(function (a, b) { return a + S.pantryOf(b).q; }, 0);
+      h += '<div class="lochead l-' + l.k + '">' + l.i + " " + l.t + "<small>" + ks.length + " Artikel · " + pcs + " Stück</small></div>";
+      ks.forEach(function (b) { h += pantryRow(b, l); });
+    });
+    return h;
+  }
+  function pantryRow(b, l) {
+    var p = S.products[b], v = S.pantryOf(b), old = Date.now() - v.since > (l.k === "tk" ? 90 : l.k === "kuehl" ? 7 : 60) * 864e5;
+    var lots = v.lots.slice().sort(function (x, y) { return x.d - y.d; }).map(function (x) { return x.q + "× " + U.day(x.d) + (x.src === "kauf" ? " 🛒" : ""); }).join(" · ");
+    return '<div class="row l-' + l.k + (old ? " old" : "") + '" data-b="' + esc(b) + '">' +
+      '<button class="locbtn" data-act="setloc" aria-label="Lagerort ändern">' + l.i + "</button>" + thumb(p) +
+      '<div class="info" data-act="edit"><div class="name">' + esc(p.name) + '</div><div class="since">seit ' + U.day(v.since) + " · " + ago(v.since) + "</div>" + (v.lots.length === 1 && v.lots[0].src === "kauf" ? '<div class="sub">🛒 eingekauft</div>' : "") +
+      (v.lots.length > 1 ? '<div class="sub">' + lots + "</div>" : "") + "</div>" +
+      '<div class="right"><button class="tolist' + (inList(b) ? " on" : "") + '" data-act="tolist" aria-label="Auf die Einkaufsliste">🛒</button>' +
+      '<div class="qty"><button data-act="pout" aria-label="eins entnehmen">−</button><span>' + v.q + '</span><button data-act="pin" aria-label="eins dazu">+</button></div></div></div>';
+  }
+  function chooseLoc(b) {
+    var p = S.products[b];
+    ask("Wo lagert <b>" + esc(p.name) + "</b>?", "Lagerort wählen", S.LOCS.map(function (l) {
+      return { t: l.i + " " + l.t, primary: S.locOf(b) === l.k, fn: function () { p.loc = l.k; S.save(); render(); } };
+    }));
+  }
 
   /* ---------- Alle Artikel ---------- */
   var iFilter = "", iSort = "name";
@@ -334,6 +435,14 @@
     if (a.dataset.go && !a.dataset.act) { go(a.dataset.go); return; }
     var act = a.dataset.act, row = a.closest(".row"), b = row && row.dataset.b;
     if (act === "scan") { openScan(); return; }
+    if (act === "scanin") { openScan("in"); return; }
+    if (act === "scanout") { openScan("out"); return; }
+    if (act === "finish") { finishShopping(); return; }
+    if (act === "pin") { S.pantryAdd(b, 1, Date.now(), "hand"); S.save(); render(); return; }
+    if (act === "pout") { pantryOut(b); return; }
+    if (act === "ploc") { pLoc = a.dataset.l; render(); return; }
+    if (act === "setloc") { chooseLoc(b); return; }
+    if (act === "tolist") { if (inList(b)) toast("Steht schon auf der Liste"); else { S.addToList(b, 1); S.save(); render(); toast("✓ " + S.products[b].name + " → " + S.activeList().name); } return; }
     if (act === "new") { openEdit(null, { add: true }); return; }
     if (act === "compare") { Compare.open(); return; }
     if (act === "offers") { checkOffers(true); return; }
@@ -418,9 +527,15 @@
       (others ? '<div class="hint">Bekannt: ' + others.replace(/ · $/, "") + "</div>" : "") +
       '<label class="f">Pfand pro Stück (€) – optional</label><input type="text" id="fD" inputmode="decimal" value="' + (p && p.deposit ? U.cents2str(p.deposit) : "") + '" placeholder="kein Pfand" autocomplete="off">' +
       '<div class="chips2"><button class="chip" type="button" data-d="">kein</button><button class="chip" type="button" data-d="0,08">0,08</button><button class="chip" type="button" data-d="0,15">0,15</button><button class="chip" type="button" data-d="0,25">0,25</button></div>' +
+      '<label class="f">Lagerort im Vorrat</label><div class="chips2" id="fLoc">' + S.LOCS.map(function (x) {
+        var cur = p ? S.locOf(b) : S.guessLoc(opts.name || "");
+        return '<button class="chip loc l-' + x.k + (cur === x.k ? " on" : "") + '" type="button" data-loc="' + x.k + '">' + x.i + " " + x.t + "</button>"; }).join("") + "</div>" +
       (real ? '<label class="f">Barcode</label><input type="text" id="fB" value="' + esc(b) + '" readonly>'
             : '<label class="f">Barcode – optional</label><input type="text" id="fB" inputmode="numeric" placeholder="Nummer unter dem Strichcode" autocomplete="off">') +
-      '<label class="check"><input type="checkbox" id="fL"' + (addDefault ? " checked" : "") + "> Auf die Liste „" + esc(l.name) + "“" + (have ? " (steht schon " + have + "× drauf → +1)" : "") + "</label>" +
+      (opts.target === "pantry"
+        ? '<label class="check"><input type="checkbox" id="fL"' + (addDefault ? " checked" : "") + "> In den Vorrat (+1, heute)" + (p && S.pantryOf(b).q ? " – schon " + S.pantryOf(b).q + "× im Haus" : "") + "</label>"
+        : '<label class="check"><input type="checkbox" id="fL"' + (addDefault ? " checked" : "") + "> Auf die Liste „" + esc(l.name) + "“" + (have ? " (steht schon " + have + "× drauf → +1)" : "") + "</label>") +
+      (p && S.pantryOf(b).q && opts.target !== "pantry" ? '<div class="hint pan">🥫 Im Vorrat: ' + S.pantryOf(b).q + "× seit " + U.day(S.pantryOf(b).since) + "</div>" : "") +
       (p ? '<h3>🏷 Angebote</h3><div id="offs"></div>' +
         '<div class="offadd"><select id="oS" aria-label="Markt">' + state.stores.map(function (x) { return '<option' + (x === state.store ? " selected" : "") + ">" + esc(x) + "</option>"; }).join("") + "</select>" +
         '<input type="text" id="oP" inputmode="decimal" placeholder="Preis" autocomplete="off"><input type="date" id="oU" value="' + plusDays(6) + '" aria-label="gültig bis"></div>' +
@@ -431,11 +546,16 @@
       '<div class="col"><button class="btn primary" id="eSave" type="button" style="flex:none">Speichern</button>' +
       (real ? '<button class="btn" id="eFind" type="button">🔎 Online nach Name suchen</button>' : "") +
       (p ? '<button class="btn danger" id="eDel" type="button">Artikel löschen</button>' : "") + "</div>");
-    ctx = { b: b, img: p && p.img || undefined, imgUrl: p && p.imgUrl || "" };
+    ctx = { b: b, target: opts.target || "list", img: p && p.img || undefined, imgUrl: p && p.imgUrl || "" };
     showPhoto();
     $("eSave").onclick = saveEdit;
     if ($("eDel")) sure($("eDel"), function () { var n = p.name; S.removeProduct(b); S.save(); closeEdit(); render(); toast(n + " gelöscht"); });
     if ($("eFind")) $("eFind").onclick = function () { findOnline(); };
+    ctx.loc = p ? S.locOf(b) : S.guessLoc(opts.name || ""); ctx.locSet = !!(p && p.loc);
+    $("fLoc").onclick = function (e) { var x = e.target.closest("[data-loc]"); if (!x) return; ctx.loc = x.dataset.loc; ctx.locSet = true;
+      Array.prototype.forEach.call(this.querySelectorAll("[data-loc]"), function (y) { y.classList.toggle("on", y === x); }); };
+    $("fN").addEventListener("input", function () { if (ctx.locSet) return; ctx.loc = S.guessLoc(this.value);
+      Array.prototype.forEach.call(document.querySelectorAll("#fLoc [data-loc]"), function (y) { y.classList.toggle("on", y.dataset.loc === ctx.loc); }); });
     Array.prototype.forEach.call(document.querySelectorAll("#edit [data-d]"), function (bt) { bt.onclick = function () { $("fD").value = bt.getAttribute("data-d"); }; });
     $("fN").onkeydown = $("fP").onkeydown = function (e) { if (e.key === "Enter") { e.preventDefault(); saveEdit(); } };
     function onPhoto() {
@@ -489,6 +609,8 @@
       var note = [];
       if (!$("fN").value.trim()) { $("fN").value = r.name; note.push("Name"); }
       if (r.imgUrl && !ctx.img && !ctx.imgUrl) { ctx.imgUrl = r.imgUrl; showPhoto(); note.push("Foto"); }
+      if (r.loc && !ctx.locSet) { ctx.loc = r.loc; Array.prototype.forEach.call(document.querySelectorAll("#fLoc [data-loc]"), function (y) { y.classList.toggle("on", y.dataset.loc === r.loc); }); }
+      else if (!ctx.locSet) { ctx.loc = S.guessLoc($("fN").value); Array.prototype.forEach.call(document.querySelectorAll("#fLoc [data-loc]"), function (y) { y.classList.toggle("on", y.dataset.loc === ctx.loc); }); }
       if (r.deposit && !$("fD").value.trim()) { $("fD").value = U.cents2str(r.deposit); note.push("Pfand " + money(r.deposit) + " (Vorschlag, bitte prüfen)"); }
       msg(note.length ? "Gefunden: " + note.join(", ") + ". Jetzt den Preis eintippen." : "Nichts Neues gefunden.", "ok");
       if (!$("fP").value.trim()) $("fP").focus();
@@ -513,16 +635,17 @@
       if (!b) b = nb.length >= 8 ? nb : S.newKey(name);
       var p = S.products[b] || (S.products[b] = { b: b, name: name, prices: {}, created: Date.now() });
       p.name = name; if (!p.prices) p.prices = {};
+      if (ctx.loc) p.loc = ctx.loc;
       if (raw !== "") S.setPrice(b, state.store, pr); else delete p.prices[state.store];
       if (dv > 0) p.deposit = dv; else delete p.deposit;
       if (ctx.img) p.img = ctx.img; else delete p.img;
       if (ctx.imgUrl) p.imgUrl = ctx.imgUrl; else delete p.imgUrl;
       if (nb.length >= 8 && b !== nb) { p = S.rekey(b, nb, p); b = nb; }
-      var add = $("fL").checked;
-      if (add) S.addToList(b, 1);
-      S.save();
-      var t = name + (p.prices[state.store] != null ? " · " + money(p.prices[state.store]) : "") + (add ? " → Liste" : " gespeichert");
-      closeEdit(); render(); toast("✓ " + t);
+      var add = $("fL").checked, target = ctx.target, price = p.prices[state.store] != null ? " · " + money(p.prices[state.store]) : "";
+      S.save(); closeEdit();
+      if (add && target === "pantry") { pantryIn(b); return; }
+      if (add) { render(); askPantry(b, function () { S.addToList(b, 1); S.save(); render(); toast("✓ " + name + price + " → Liste"); }); return; }
+      render(); toast("✓ " + name + price + " gespeichert");
     } catch (e) { msg("Speichern fehlgeschlagen: " + (e && e.message || e), "bad"); }
   }
 
@@ -632,13 +755,24 @@
   }
 
   /* ================= Scannen ================= */
+  var scanMode = "list";
+  function setMode(m) {
+    scanMode = m;
+    Array.prototype.forEach.call(document.querySelectorAll("#smode [data-m]"), function (b) { b.classList.toggle("on", b.dataset.m === m); });
+    $("strip").dataset.mode = m;
+  }
+  $("smode").addEventListener("click", function (e) { var b = e.target.closest("[data-m]"); if (b) setMode(b.dataset.m); });
   function handleCode(code) {
     code = String(code).replace(/\D/g, ""); if (!code) { toast("Ungültiger Barcode"); return; }
+    if (scanMode === "out") { if (!S.products[code]) toast("Unbekannter Artikel – nicht im Vorrat"); else pantryOut(code); return; }
+    if (scanMode === "in") { if (!S.products[code]) openEdit(code, { add: true, target: "pantry" }); else pantryIn(code); return; }
     if (!S.products[code]) { openEdit(code, { add: true }); return; }
-    S.addToList(code, 1); S.save(); render();
-    var p = S.products[code], pr = S.priceOf(code);
-    if (pr == null) { openEdit(code, { add: false }); msg("Steht jetzt auf der Liste. Preis bei " + state.store + " fehlt noch – bitte eintippen.", "ok"); return; }
-    toast("✓ " + p.name + " · " + money(pr) + " → Liste");
+    askPantry(code, function () {
+      S.addToList(code, 1); S.save(); render();
+      var p = S.products[code], pr = S.effPrice(code);
+      if (pr == null) { openEdit(code, { add: false }); msg("Steht jetzt auf der Liste. Preis bei " + state.store + " fehlt noch – bitte eintippen.", "ok"); return; }
+      toast("✓ " + p.name + " · " + money(pr) + " → Liste");
+    });
   }
 
   var live = { on: false, paused: false };
@@ -654,12 +788,13 @@
       toast((e && e.message || "Kamera nicht verfügbar") + " Nutze „📸 Foto“ oder „123“.", 7000);
     });
   }
-  function openScan() { if (live.on) return; live.on = true; live.paused = false; $("strip").classList.remove("fail"); liveUI(); startStream(); }
+  function openScan(m) { setMode(m || (tab === "pantry" ? "in" : "list")); if (live.on) return; live.on = true; live.paused = false; $("strip").classList.remove("fail"); liveUI(); startStream(); }
   function closeScan() { live.on = false; live.paused = false; Scanner.stop(); $("torch").classList.remove("on"); liveUI(); }
   function pauseLive() { if (live.on && !live.paused) { live.paused = true; Scanner.stop(); liveUI(); } }
   function resumeLive() { if (live.on && live.paused) { live.paused = false; liveUI(); startStream(); } }
 
   $("scanBtn").addEventListener("click", function () { if (live.on) closeScan(); else openScan(); });
+  setMode("list");
   $("scanClose").addEventListener("click", closeScan);
   $("torch").addEventListener("click", function () {
     var t = this, want = !t.classList.contains("on");

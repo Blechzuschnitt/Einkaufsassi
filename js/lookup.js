@@ -36,7 +36,10 @@ var Lookup = (function () {
       if (brand && name.toLowerCase().indexOf(brand.toLowerCase()) < 0) name = brand + " " + name;
       name = clean(name);
       if (qty && name.toLowerCase().indexOf(qty.toLowerCase()) < 0) name += " " + qty;
-      return { name: name.slice(0, 80), imgUrl: p.image_front_small_url || "", deposit: depositGuess(p) };
+      var cats = p.categories_tags || [], loc = "";
+      if (has(cats, ["en:frozen-foods", "en:frozen-desserts", "en:ice-creams-and-sorbets", "en:frozen-pizzas", "en:frozen-vegetables"])) loc = "tk";
+      else if (has(cats, ["en:dairies", "en:cheeses", "en:yogurts", "en:meats", "en:fresh-foods", "en:chilled-foods", "en:hams", "en:sausages", "en:fishes", "en:eggs", "en:butters"])) loc = "kuehl";
+      return { name: name.slice(0, 80), imgUrl: p.image_front_small_url || "", deposit: depositGuess(p), loc: loc };
     });
   }
   /* Angebote aus Open Prices (offene Preisdatenbank von Open Food Facts):

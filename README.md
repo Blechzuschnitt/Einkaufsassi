@@ -9,6 +9,7 @@ Eine kleine Web-App für dein Handy. Alles läuft im Browser, deine Daten bleibe
 - **Artikel-Seite:** alle erfassten Artikel mit Preisen je Markt, filtern, sortieren.
 - **Kassenbon-Vergleich:** Bon-Text einfügen, die App ordnet die Zeilen der Liste zu und zeigt teurer/günstiger, nicht geplant, vergessen. Neue Preise lassen sich übernehmen.
 - **Angebote:** Die Liste prüft Artikel mit Barcode automatisch in Open Prices (offene Preisdatenbank, in Deutschland gemeldete Angebote der letzten 3 Wochen). Eigene Angebote (Markt, Preis, gültig bis) trägst du im Artikel ein; sie zählen in Summe und Marktvergleich mit und verschwinden nach Ablauf. Dazu Such-Knöpfe für Marktguru und kaufDA.
+- **Vorrat:** was du zu Hause hast, mit Datum. Ein- und Austragen per Suche, +/− oder Scan (Scan-Modus „＋ Vorrat“ / „− Vorrat“). Nach dem Einkauf („Einkauf fertig“ oder Bon-Vergleich) landen die Artikel mit Datum im Vorrat. Willst du etwas auf die Liste setzen, das noch im Vorrat ist, fragt die App nach, ob es noch da ist.
 - **Statistik:** Ausgaben pro Monat und Markt, häufigste Artikel, Preisänderungen, Listenpreis je Markt.
 - **Live-Scan:** Kamera-Zeile unten, Barcode davorhalten, Piepton, fertig. Bekannte Artikel landen sofort im Wagen.
 - **Neuer Artikel:** Name, Foto und (wenn möglich) Pfand holt sich die App online aus Open Food Facts. Du tippst nur den Preis ein.
