@@ -1,5 +1,5 @@
 /* Offline-Fähigkeit: App-Dateien werden beim ersten Besuch gespeichert (im Laden oft kein Netz). */
-var VERSION = "einkauf-v11";
+var VERSION = "einkauf-v12";
 var ASSETS = ["./", "index.html", "style.css", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png",
   "js/data.js", "js/ui.js", "js/store.js", "js/lookup.js", "js/scanner.js", "js/compare.js", "js/app.js", "js/zxing.min.js"];
 

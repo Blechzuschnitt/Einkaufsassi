@@ -139,7 +139,7 @@ var Store = (function () {
     return String(n).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
       .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "x";
   }
-  function newKey(name) { var base = "r-" + slug(name), k = base, i = 2; while (products[k]) k = base + "-" + i++; return k; }
+  function newKey(name, pre) { var base = (pre || "r-") + slug(name), k = base, i = 2; while (products[k]) k = base + "-" + i++; return k; }
   function eachListItem(fn) { state.lists.forEach(function (l) { l.items.forEach(function (it) { fn(it, l); }); }); }
 
   /* Artikel ohne Barcode ("r-…") bekommt später einen echten Barcode */
