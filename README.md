@@ -46,7 +46,7 @@ Im Ordner `python -m http.server 8000` ausführen und `http://localhost:8000` ö
 |---|---|
 | `index.html` | Seitengerüst |
 | `style.css` | Aussehen (dunkel, hoher Kontrast) |
-| `js/data.js` | Märkte und die Artikel aus deinen Lidl-Bons |
+| `js/data.js` | Start-Märkte (keine Artikel – die legt jede Person selbst an) |
 | `js/ui.js` | Helfer (Geld, Text-Ähnlichkeit) |
 | `js/store.js` | Speichern, Listen, Einkäufe, Sicherung |
 | `js/compare.js` | Kassenbon einlesen und mit der Liste vergleichen |

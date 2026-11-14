@@ -14,7 +14,7 @@ S.load().then(function () {
   /* Startauswahl – nicht, wenn die App gezielt geöffnet wurde (Benachrichtigung, Anmelde-Link) */
   if (!pt && location.hash.indexOf("access_token") < 0) launchStart();
   cloudStart();
-  if (seeded) toast("Lidl: Artikel von deinen Kassenbons eingetragen", 4000);
+  if (seeded) toast("Startdaten eingetragen", 4000);
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
 });
 if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) navigator.serviceWorker.register("sw.js").catch(function () {});

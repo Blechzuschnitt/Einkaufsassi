@@ -24,8 +24,27 @@ function showLaunch() {
     d.remove(); launchTo(b.dataset.k);
   };
 }
+/* Erster Start: Funktionen auswählen (später im Menü änderbar) */
+function showOnboard(next) {
+  var d = document.createElement("div"); d.id = "launch"; d.className = "onb"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Willkommen");
+  d.innerHTML = '<div class="lwrap"><div class="ltitle">Willkommen</div><div class="lq">Welche Funktionen möchtest du nutzen?<br><small>Du kannst das jederzeit im Menü unter „Funktionen“ ändern.</small></div>' +
+    '<div class="card" id="oFeat">' + FEATURES.map(function (f) {
+      return '<label class="tog"><span><b>' + f[1] + "</b><small>" + f[2] + '</small></span><input type="checkbox" data-f="' + f[0] + '"' + (F(f[0]) ? " checked" : "") + "><i></i></label>"; }).join("") + "</div>" +
+    '<div class="col"><button class="btn primary" id="oGo" type="button" style="flex:none">Los geht’s</button></div></div>';
+  document.body.appendChild(d);
+  $("oGo").onclick = function () {
+    state.features = {};
+    Array.prototype.forEach.call(d.querySelectorAll("[data-f]"), function (x) { state.features[x.dataset.f] = x.checked; });
+    state.onboarded = true; S.save(); d.remove(); render(); next();
+  };
+}
 /* beim Start aufrufen */
 function launchStart() {
+  if (!state.onboarded) {
+    /* wer schon Daten hat, nutzt die App bereits – nicht nochmal fragen */
+    if (Object.keys(S.products).length || state.purchases.length) { state.onboarded = true; S.save(); }
+    else { showOnboard(launchStart); return; }
+  }
   if (state.launch) { launchTo(state.launch); return; }
   showLaunch();
 }

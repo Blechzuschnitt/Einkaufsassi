@@ -552,3 +552,6 @@ body.shopmode header{display:none}
 .tog input:checked + i{background:var(--accent);border-color:var(--accent)}
 .tog input:checked + i::after{left:22px;background:#000}
 .tog input:focus-visible + i{outline:2px solid var(--ink);outline-offset:2px}
+#launch.onb{align-items:flex-start;overflow:auto}
+#launch.onb .lq small{display:block;font-size:13px;margin-top:4px}
+#launch.onb .card{margin-bottom:6px}
