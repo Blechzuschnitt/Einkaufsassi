@@ -523,3 +523,19 @@ body.shopmode header{display:none}
 .tolist .ic{width:18px;height:18px}
 .tolist.on{color:var(--accent);border-color:var(--accent);background:transparent}
 .addloc{grid-template-columns:110px 1fr 54px}
+
+/* ---- Startauswahl ---- */
+#launch{position:fixed;inset:0;z-index:95;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom))}
+#launch .lwrap{width:100%;max-width:440px}
+#launch .ltitle{font-size:30px;font-weight:800;text-align:center}
+#launch .lq{color:var(--muted);text-align:center;margin:4px 0 22px;font-size:17px}
+#launch .lopt{display:flex;align-items:center;gap:16px;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px 16px;margin:0 0 12px;color:var(--ink);min-height:92px}
+#launch .lopt:first-of-type{border-color:var(--accent)}
+#launch .li{flex:none;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#000;display:grid;place-items:center}
+#launch .lopt[data-k=pantry] .li{background:#fff}
+#launch .lopt[data-k=shop] .li{background:var(--card2);color:var(--accent);border:2px solid var(--accent)}
+#launch .li .ti{width:28px;height:28px}
+#launch .lt{display:flex;flex-direction:column;gap:3px;min-width:0}
+#launch .lt b{font-size:21px}
+#launch .lt small{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#launch .lremember{justify-content:center;color:var(--muted);font-size:14px;margin-top:16px}

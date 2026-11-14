@@ -181,12 +181,15 @@ function openMenu() {
       return '<div class="kv mrow"><span>' + locIco(l) + " " + esc(l.t) + "</span>" + (i < 3 ? "<small>fest</small>" : '<button class="chip" type="button" data-ldel="' + esc(l.k) + '">entfernen</button>') + "</div>"; }).join("") + "</div>" +
     '<div class="addloc"><select id="mLocI" aria-label="Symbol">' + [["box", "Kiste"], ["basket", "Korb"], ["bottle", "Flasche"], ["shelf", "Regal"], ["door", "Tür"], ["home", "Haus"]].map(function (x) { return '<option value="' + x[0] + '">' + x[1] + "</option>"; }).join("") +
     '</select><input type="text" id="mLocN" placeholder="z. B. Keller" autocomplete="off"><button class="btn" id="mLocAdd" type="button">＋</button></div>' +
+    '<h3>Beim Öffnen</h3><div class="chips2" id="mLaunch">' + [["", "Fragen"], ["home", "Einkaufen"], ["shop", "Einkaufsmodus"], ["pantry", "Lager"]].map(function (x) {
+      return '<button class="chip' + ((state.launch || "") === x[0] ? " on" : "") + '" type="button" data-l="' + x[0] + '">' + x[1] + "</button>"; }).join("") + "</div>" +
     '<h3>Erinnerung</h3><div class="col" style="margin-top:0"><button class="btn" id="mNotify" type="button">' + I("bell") + ' MHD-Erinnerung aufs Handy: ' + notifyStatus() + "</button></div>" +
     '<div class="hint">Das Handy meldet sich, wenn etwas im Vorrat in den nächsten Tag abläuft. Im Hintergrund klappt das nur, wenn die App auf dem Startbildschirm installiert ist (Chrome/Android).</div>' +
     '<h3>Budget</h3><div class="col" style="margin-top:0"><button class="btn" id="mBud" type="button">' + (state.budget ? "Monatsbudget: " + money(state.budget) + " – ändern" : "Monatsbudget festlegen") + "</button></div>" +
     '<h3>Sicherung</h3><div class="hint" style="margin-top:0">Deine Daten liegen nur auf diesem Gerät. ' + (state.lastBackup ? "Letzte Sicherung: " + U.day(state.lastBackup) + "." : "Noch keine Sicherung gemacht.") + "</div>" +
     '<div class="col">' +
-    '<button class="btn primary" id="mSave" type="button" style="flex:none">' + I("download") + ' Sicherung speichern</button>' +
+    '<button class="btn primary" id="mCloud" type="button" style="flex:none">' + I("upload") + ' Cloud-Sicherung: ' + cloudStatusText().replace(/<[^>]+>/g, "") + "</button>" +
+    '<button class="btn" id="mSave" type="button">' + I("download") + ' Sicherung speichern</button>' +
     '<button class="btn" id="mCopy" type="button">' + I("copy") + ' Sicherung kopieren</button>' +
     '<label class="btn" for="mFile">' + I("upload") + ' Sicherung aus Datei laden</label><input type="file" id="mFile" class="hide" accept=".json,application/json"></div>' +
     '<label class="f">Oder Sicherung hier einfügen</label><textarea id="mTxt" placeholder="{ … }"></textarea>' +
@@ -211,6 +214,9 @@ function openMenu() {
   });
   $("mSave").onclick = function () { doBackup(); msg("Sicherung wurde heruntergeladen.", "ok"); };
   $("mBud").onclick = function () { closeEdit(); askBudget(); };
+  $("mLaunch").onclick = function (e) { var x = e.target.closest("[data-l]"); if (!x) return; state.launch = x.dataset.l; S.save();
+    Array.prototype.forEach.call(this.querySelectorAll("[data-l]"), function (y) { y.classList.toggle("on", y === x); }); };
+  $("mCloud").onclick = function () { closeEdit(); openCloud(); };
   $("mNotify").onclick = function () { toggleNotify().then(function () { if ($("mNotify")) $("mNotify").textContent = "MHD-Erinnerung aufs Handy: " + notifyStatus(); }); };
   $("mLocAdd").onclick = function () {
     var n = $("mLocN").value.trim(); if (!n) { msg("Bitte einen Namen für den Lagerort eingeben.", "bad"); return; }

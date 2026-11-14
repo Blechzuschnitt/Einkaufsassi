@@ -5,10 +5,15 @@ window.App = { openShell: openShell, closeEdit: closeEdit, msg: msg, render: ren
 
 /* ---------- Start ---------- */
 S.onStatus(setSync);
+S.onStatus(function (m) { if (m === "ok") cloudSchedule(); });
 S.load().then(function () {
   var seeded = S.applySeeds();
-  try { var pt = new URLSearchParams(location.search).get("tab"); if (pt && /^(home|list|pantry|stats|items)$/.test(pt)) tab = pt; } catch (e) {}
+  var pt = ""; try { pt = new URLSearchParams(location.search).get("tab") || ""; } catch (e) {}
+  if (/^(home|list|pantry|stats|items)$/.test(pt)) tab = pt;
   render();
+  /* Startauswahl – nicht, wenn die App gezielt geöffnet wurde (Benachrichtigung, Anmelde-Link) */
+  if (!pt && location.hash.indexOf("access_token") < 0) launchStart();
+  cloudStart();
   if (seeded) toast("Lidl: Artikel von deinen Kassenbons eingetragen", 4000);
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
 });
