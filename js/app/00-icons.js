@@ -39,6 +39,8 @@ var IC = {
   bottle: '<path d="M10 2h4v4l2 3v12H8V9l2-3z"/><path d="M8 13h8"/>',
   door: '<path d="M6 3h12v18H6z"/><circle cx="14.5" cy="12" r=".8"/>',
   shelf: '<path d="M3 4v16M21 4v16M3 9h18M3 15h18"/><path d="M6 9V6h4v3M13 15v-4h3v4"/>',
+  spray: '<path d="M9 9h6v12H9z"/><path d="M10 9V6h3l1-2"/><path d="M14 4h4M17 7l2-1M17 9h2"/><path d="M9 14h6"/>',
+  bath: '<path d="M3 12h18v3a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="M7 20l-1 2M17 20l1 2"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   swap: '<path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 12 4 4-4 4"/><path d="M21 16H7"/>',
   chevron: '<path d="m6 9 6 6 6-6"/>',

@@ -2,13 +2,14 @@
 "use strict";
 /* ---------- Vorrat-Seite (Trocken / Kühlschrank / Gefrierschrank) ---------- */
 var pLoc = "all";
+function shortLoc(t) { return { Haushaltsartikel: "Haushalt", Badezimmer: "Bad" }[t] || t.replace("schrank", ""); }
 function locInfo(k) { return S.LOCS.filter(function (l) { return l.k === k; })[0] || S.LOCS[0]; }
 function viewPantry() {
   var keys = Object.keys(state.pantry).filter(function (b) { return S.products[b] && S.pantryOf(b).q > 0; });
   var cnt = { all: keys.length }; S.LOCS.forEach(function (l) { cnt[l.k] = 0; });
   keys.forEach(function (b) { cnt[S.locOf(b)]++; });
   var h = recipeButton() + '<div class="locchips"><button type="button" class="lc' + (pLoc === "all" ? " on" : "") + '" data-act="ploc" data-l="all"><span>Alle</span><b>' + cnt.all + "</b></button>" +
-    S.LOCS.map(function (l) { return '<button type="button" class="lc l-' + l.k + (pLoc === l.k ? " on" : "") + '" data-act="ploc" data-l="' + l.k + '">' + "<span>" + locIco(l) + " " + l.t.replace("schrank", "") + "</span><b>" + cnt[l.k] + "</b></button>"; }).join("") + "</div>";
+    S.LOCS.map(function (l) { return '<button type="button" class="lc l-' + l.k + (pLoc === l.k ? " on" : "") + '" data-act="ploc" data-l="' + l.k + '">' + "<span>" + locIco(l) + " " + shortLoc(l.t) + "</span><b>" + cnt[l.k] + "</b></button>"; }).join("") + "</div>";
   if (!keys.length) return h + '<div class="empty">Noch nichts im Vorrat.<br>Oben einen Artikel suchen, unten <b>Einlagern</b> scannen,<br><b>Reste</b> eintragen oder nach dem Einkauf „Einkauf fertig“ tippen.</div>';
   keys.sort(function (a, b) {
     var x = S.pantryOf(a), y = S.pantryOf(b);

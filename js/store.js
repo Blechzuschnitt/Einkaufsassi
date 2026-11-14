@@ -60,7 +60,11 @@ var Store = (function () {
     if (!state.templates) state.templates = [];   // Listen-Vorlagen: [{id, name, items:[{b, qty}]}]
     if (!state.locs) state.locs = LOCS.slice();   // Lagerorte (die ersten drei fest, weitere selbst angelegt)
     var EM = { "🥫": "jar", "🥛": "milk", "🧊": "snow", "📦": "box", "🧺": "basket", "🍷": "bottle", "🏠": "home", "🚪": "door" };
-    state.locs.forEach(function (l) { if (EM[l.i]) l.i = EM[l.i]; });   // Vorrat: {key: [{q, d, src}]} – Einlagerungen mit Datum   // Kundenkarten: {Markt: {code, d}} – nur auf diesem Gerät
+    state.locs.forEach(function (l) { if (EM[l.i]) l.i = EM[l.i]; });
+    if (state.seeded.indexOf("locs-haushalt-bad") < 0) {   /* einmalig ergänzen; wer sie löscht, bekommt sie nicht zurück */
+      EXTRA_LOCS.forEach(function (x) { if (!state.locs.some(function (l) { return l.k === x.k; })) state.locs.push(x); });
+      state.seeded.push("locs-haushalt-bad");
+    }   // Vorrat: {key: [{q, d, src}]} – Einlagerungen mit Datum   // Kundenkarten: {Markt: {code, d}} – nur auf diesem Gerät
     if (state.v !== 3) {
       var cart = state.cart || {};
       Object.keys(cart).forEach(function (st) {
@@ -182,7 +186,13 @@ var Store = (function () {
   var LOCS = [{ k: "trocken", t: "Trocken", i: "jar" }, { k: "kuehl", t: "Kühlschrank", i: "milk" }, { k: "tk", t: "Gefrierschrank", i: "snow" }];
   var TK = /(tiefk[uü]hl|\btk\b|gefrier|\beis\b|eiscreme|pizza|pommes|fischst[aä]bchen|frozen)/i;
   var KUEHL = /(milch(?!schoko)|joghurt|quark|k[aä]se|butter|sahne|schmand|wurst|salami|schinken|fleisch|h[aä]hn|geschnetzel|cordon|antipasti|\beier\b|tofu|hack|lachs|aufschnitt|s[oö]derg[aå]rden|remoulade|feinkost|salat\b)/i;
-  function guessLoc(name) { return TK.test(name || "") ? "tk" : KUEHL.test(name || "") ? "kuehl" : "trocken"; }
+  var EXTRA_LOCS = [{ k: "haushalt", t: "Haushaltsartikel", i: "spray" }, { k: "bad", t: "Badezimmer", i: "bath" }];
+  var HAUS = /(sp[uü]lm|reinig|waschmittel|weichsp|m[uü]llbeutel|alufolie|frischhalte|backpapier|k[uü]chenrolle|schwamm|tragetasche|batterie|kerze|gl[uü]hbirne|feuerzeug|tabs)/i;
+  var BAD = /(shampoo|duschgel|dusch|zahnpasta|zahncreme|zahnb[uü]rste|deo|seife|toilettenpapier|klopapier|rasier|tampon|binden|wattepad|wattest|handcreme|bodylotion|sp[uü]lung|haargel)/i;
+  function guessLoc(name) {
+    var n = name || "", k = TK.test(n) ? "tk" : KUEHL.test(n) ? "kuehl" : BAD.test(n) ? "bad" : HAUS.test(n) ? "haushalt" : "trocken";
+    return state.locs && !state.locs.some(function (l) { return l.k === k; }) ? "trocken" : k;   /* gelöschter Lagerort → Trocken */
+  }
   function locOf(b) {
     var p = products[b], k = p && p.loc;
     if (k && state.locs.some(function (l) { return l.k === k; })) return k;

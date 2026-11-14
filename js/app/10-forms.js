@@ -179,7 +179,7 @@ function openMenu() {
     "<h3>Märkte</h3><div class=\"card\">" + ms + '</div><div class="col" style="margin-top:8px"><button class="btn" id="mAdd" type="button">＋ Markt hinzufügen</button></div>' +
     '<h3>Lagerorte</h3><div class="card" id="mLocs">' + S.LOCS.map(function (l, i) {
       return '<div class="kv mrow"><span>' + locIco(l) + " " + esc(l.t) + "</span>" + (i < 3 ? "<small>fest</small>" : '<button class="chip" type="button" data-ldel="' + esc(l.k) + '">entfernen</button>') + "</div>"; }).join("") + "</div>" +
-    '<div class="addloc"><select id="mLocI" aria-label="Symbol">' + [["box", "Kiste"], ["basket", "Korb"], ["bottle", "Flasche"], ["shelf", "Regal"], ["door", "Tür"], ["home", "Haus"]].map(function (x) { return '<option value="' + x[0] + '">' + x[1] + "</option>"; }).join("") +
+    '<div class="addloc"><select id="mLocI" aria-label="Symbol">' + [["box", "Kiste"], ["basket", "Korb"], ["bottle", "Flasche"], ["shelf", "Regal"], ["door", "Tür"], ["home", "Haus"], ["spray", "Putzmittel"], ["bath", "Bad"]].map(function (x) { return '<option value="' + x[0] + '">' + x[1] + "</option>"; }).join("") +
     '</select><input type="text" id="mLocN" placeholder="z. B. Keller" autocomplete="off"><button class="btn" id="mLocAdd" type="button">＋</button></div>' +
     '<h3>Beim Öffnen</h3><div class="chips2" id="mLaunch">' + [["", "Fragen"], ["home", "Einkaufen"], ["shop", "Einkaufsmodus"], ["pantry", "Lager"]].map(function (x) {
       return '<button class="chip' + ((state.launch || "") === x[0] ? " on" : "") + '" type="button" data-l="' + x[0] + '">' + x[1] + "</button>"; }).join("") + "</div>" +

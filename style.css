@@ -539,3 +539,4 @@ body.shopmode header{display:none}
 #launch .lt b{font-size:21px}
 #launch .lt small{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #launch .lremember{justify-content:center;color:var(--muted);font-size:14px;margin-top:16px}
+.lc span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
